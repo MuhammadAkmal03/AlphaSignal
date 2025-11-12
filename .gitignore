@@ -1,0 +1,15 @@
+*.log
+
+*.pkl 
+
+/data/raw 
+
+__pycache__
+
+venv/
+
+*.env 
+
+models/
+
+data/
