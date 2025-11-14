@@ -3,3 +3,15 @@ pandas
 requests
 python-dotenv
 websocket-client
+opencv-python
+transformers
+torch
+pyarrow
+xgboost
+scikit-learn
+shap
+Pillow
+sentinelsat
+rasterio
+numpy
+sentinelhub
