@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 load_dotenv()
 AIS_KEY = os.getenv("AISSTREAM_API_KEY")
 if not AIS_KEY:
-    raise ValueError("❌ AISSTREAM_API_KEY missing in .env")
+    raise ValueError("AISSTREAM_API_KEY missing in .env")
 
 # CONFIG
 STREAM_TIME = 30        # seconds per port
@@ -125,3 +125,5 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
+
