@@ -15,3 +15,4 @@ sentinelsat
 rasterio
 numpy
 sentinelhub
+ultralytics

@@ -2,128 +2,116 @@ import os
 import json
 import asyncio
 import websockets
+import pandas as pd
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-import pandas as pd
+
 from dotenv import load_dotenv
-
 load_dotenv()
-AIS_KEY = os.getenv("AISSTREAM_API_KEY")
-if not AIS_KEY:
-    raise ValueError("AISSTREAM_API_KEY missing in .env")
 
-# CONFIG
-STREAM_TIME = 30        # seconds per port
-RAW_DIR = Path("data/raw/ships")
-RAW_DIR.mkdir(parents=True, exist_ok=True)
+AISSTREAM_API_KEY = os.getenv("AISSTREAM_API_KEY")
+if not AISSTREAM_API_KEY:
+    raise ValueError("Missing AISSTREAM_API_KEY in .env")
 
-AIS_URI = "wss://stream.aisstream.io/v0/stream"
-
-# PORT LIST (15 GLOBAL HUBS)
 PORTS = {
     "Houston": [[29.5, -95.5], [30.0, -94.5]],
-    "CorpusChristi": [[27.6, -97.8], [28.0, -97.0]],
-    "PortArthur": [[29.6, -94.0], [30.0, -93.7]],
-
+    "Singapore": [[1.1, 103.6], [1.42, 104.0]],
     "Rotterdam": [[51.8, 4.1], [52.0, 4.5]],
+    "Fujairah": [[25.0, 56.2], [25.3, 56.5]],
+    "RasTanura": [[26.4, 49.9], [26.8, 50.3]],
     "Antwerp": [[51.2, 4.2], [51.4, 4.5]],
-    "Fawley_UK": [[50.8, -1.35], [50.9, -1.25]],
-
-    "Fujairah": [[25.08, 56.30], [25.35, 56.55]],
-    "RasTanura": [[26.60, 50.00], [26.90, 50.40]],
-    "MinaAlAhmadi": [[29.0, 48.0], [29.4, 48.4]],
-
-    "Singapore": [[1.20, 103.60], [1.35, 104.00]],
-    "Qingdao": [[36.00, 120.20], [36.40, 120.80]],
-    "Dalian": [[38.70, 121.40], [39.10, 122.00]],
+    "Qingdao": [[35.9, 120.1], [36.3, 120.6]],
+    "Dalian": [[38.8, 121.3], [39.2, 121.8]],
+    "CorpusChristi": [[27.6, -97.8], [27.95, -97.2]],
+    "PortArthur": [[29.7, -94.0], [29.95, -93.6]],
+    "Fawley_UK": [[50.8, -1.4], [51.0, -1.2]],
+    "MinaAlAhmadi": [[29.0, 48.1], [29.3, 48.4]],
     "Yokohama": [[35.3, 139.5], [35.6, 139.9]],
-    "Ulsan": [[35.3, 129.2], [35.7, 129.6]],
-    "Mumbai": [[18.8, 72.7], [19.2, 73.0]]
+    "Ulsan": [[35.4, 129.2], [35.7, 129.5]],
+    "Mumbai": [[18.8, 72.7], [19.2, 73.1]],
 }
 
-# BATCH BUILDER (5 ports per batch)
-def create_batches(n=5):
-    keys = list(PORTS.keys())
-    return [keys[i:i+n] for i in range(0, len(keys), n)]
+RAW = Path("data/raw/ships")
+EXISTDATA_PATH = RAW / "s_ship_counts.csv"
 
-# STREAM SINGLE PORT (30s)
-async def stream_port(port_name, bbox):
-    tankers = set()
-    print(f"\n== Streaming {port_name} ({STREAM_TIME}s) ==")
+
+# Stream a single port for 30 seconds
+async def stream_port(port, bbox):
+    uri = "wss://stream.aisstream.io/v0/stream"
+    tanker_mmsi = set()
+    start = datetime.now(timezone.utc)
+    end = start + timedelta(seconds=30)
 
     try:
-        async with websockets.connect(AIS_URI) as ws:
-
-            # Subscription msg
+        async with websockets.connect(uri) as ws:
             sub = {
-                "APIKey": AIS_KEY,
+                "APIKey": AISSTREAM_API_KEY,
                 "BoundingBoxes": [bbox],
                 "FilterMessageTypes": ["PositionReport"]
             }
             await ws.send(json.dumps(sub))
 
-            start = datetime.now(timezone.utc)
-            end = start + timedelta(seconds=STREAM_TIME)
-
             while datetime.now(timezone.utc) < end:
-                # Progress bar
-                elapsed = (datetime.now(timezone.utc) - start).seconds
-                pct = int(elapsed / STREAM_TIME * 40)
-                bar = "[" + "█" * pct + "-" * (40 - pct) + f"] {elapsed}/{STREAM_TIME}s"
-                print(bar, end="\r")
-
-                # Receive AIS messages
                 try:
-                    msg_raw = await asyncio.wait_for(ws.recv(), timeout=2)
+                    msg_raw = await asyncio.wait_for(ws.recv(), timeout=2.0)
                 except asyncio.TimeoutError:
                     continue
 
                 msg = json.loads(msg_raw)
                 ais = msg.get("Message", {}).get("PositionReport", {})
-                if not ais:
-                    continue
-
-                mmsi = ais.get("UserID")
-                if mmsi:
-                    tankers.add(mmsi)
+                if ais:
+                    tanker_mmsi.add(ais.get("UserID"))
 
     except Exception as e:
-        print(f"\nSTREAM ERROR at {port_name}: {e}")
+        print(f"Stream error at {port}: {e}")
 
-    print(f"{port_name}: {len(tankers)} tankers")
-    return port_name, len(tankers)
+    return port, len(tanker_mmsi)
 
-# MAIN: RUN ALL BATCHES
-async def main():
-    batches = create_batches(5)
+
+# Run streaming for all ports sequentially
+async def stream_all_ports():
     results = {}
+    for port, bbox in PORTS.items():
+        print(f"\n== Streaming {port} (30s) ==\n")
+        p, cnt = await stream_port(port, bbox)
+        results[p] = cnt
+        print(f"{port}: {cnt} tankers")
 
-    for batch in batches:
-        print(f"\n=== Running batch: {batch} ===\n")
+    return results
 
-        tasks = [stream_port(name, PORTS[name]) for name in batch]
-        batch_results = await asyncio.gather(*tasks)
 
-        for port, count in batch_results:
-            results[port] = count
+# Merge data into existing dataset
+def merge_into_synthetic(real_counts):
+    df = pd.read_csv(EXISTDATA_PATH)
 
-    # Save output CSV
+    # ALWAYS keep YYYY-MM-DD format only
+    df["date"] = df["date"].astype(str).str.slice(0, 10)
+
     today = datetime.utcnow().strftime("%Y-%m-%d")
-    row = {"date": today, **results}
 
-    csv_file = RAW_DIR / "ship_counts_per_port.csv"
-    df_new = pd.DataFrame([row])
-
-    if csv_file.exists():
-        df_old = pd.read_csv(csv_file)
-        df = pd.concat([df_old, df_new], ignore_index=True)
+    # If today exists, overwrite. If not, append row.
+    if today in df["date"].values:
+        idx = df.index[df["date"] == today][0]
+        print(f"\nUpdating existing row for {today}")
     else:
-        df = df_new
+        print(f"\nAppending new row for {today}")
+        df.loc[len(df)] = [today] + [0] * (len(df.columns)-1)
+        idx = df.index[-1]
 
-    df.to_csv(csv_file, index=False)
-    print(f"\nSaved: {csv_file}")
+    print("\n== Merging real data ==")
+    for port, real_value in real_counts.items():
+        synthetic_value = df.loc[idx, port]
+        if real_value > 0:
+            df.loc[idx, port] = real_value
+            print(f"{port}: {synthetic_value} → {real_value} (updated)")
+        else:
+            print(f"{port}: kept synthetic {synthetic_value} (real=0)")
+
+    df.to_csv(EXISTDATA_PATH, index=False)
+    print("\nMerge complete! Today's AIS data saved.")
+
 
 if __name__ == "__main__":
-    asyncio.run(main())
-
-
+    print("\n=== Daily AIS Data Update (30s per port) ===\n")
+    real_counts = asyncio.run(stream_all_ports())
+    merge_into_synthetic(real_counts)
