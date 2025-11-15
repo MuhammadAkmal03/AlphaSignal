@@ -16,3 +16,4 @@ rasterio
 numpy
 sentinelhub
 ultralytics
+seaborn
