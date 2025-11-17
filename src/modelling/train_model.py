@@ -41,6 +41,10 @@ def train_model():
 
     model.fit(X_train_scaled, y_train)
 
+    booster = model.get_booster()
+    booster.save_model("models/xgb_model.json")
+
+
     # Evaluation
     preds = model.predict(X_test_scaled)
 

@@ -1,16 +1,8 @@
-import sys
-from run_phase1 import run_phase1
-from run_phase2 import run_phase2
-
-def main():
-    print("\n==============================")
-    print(" ALPHASIGNAL FULL PIPELINE")
-    print("==============================\n")
-
-    run_phase1()
-    run_phase2()
-
-    print("\n FULL PIPELINE SUCCESSFULLY COMPLETED!\n")
+from run_phase1_datapipeline import run_phase1
+from run_phase2_modelpipeline import run_phase2
+from run_phase3_predictionpipeline import run_phase3
 
 if __name__ == "__main__":
-    main()
+    # run_phase1()
+    # run_phase2()
+    run_phase3()
