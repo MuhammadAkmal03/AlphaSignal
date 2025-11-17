@@ -14,9 +14,7 @@ def engineer_features():
 
     target = "close_price"
 
-    # ---------------------------------------
     # 1. Lag + Rolling Features
-    # ---------------------------------------
     df = add_lag_features(df, target)
     df = add_rolling_features(df, target)
 
@@ -31,16 +29,12 @@ def engineer_features():
         df = add_lag_features(df, port, lags=[1,7,14])
         df = add_rolling_features(df, port)
 
-    # ---------------------------------------
     # 2. Tank fullness & fundamentals interactions
-    # ---------------------------------------
     df = add_interaction(df, "tank_inventory_score", "wti_price")
     df = add_interaction(df, "Singapore", "diesel_price")
     df = add_interaction(df, "demand_score", "close_price")
 
-    # ---------------------------------------
     # 3. Date Features
-    # ---------------------------------------
     df = add_date_features(df)
 
     # Drop rows with NaN due to rolling windows

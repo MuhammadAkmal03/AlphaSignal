@@ -6,7 +6,6 @@ from ultralytics import YOLO
 
 MODEL_PATH = "weights/yolov8l.pt"
 
-# Your Sentinel-dated folder
 IMAGE_DIR = Path("data/raw/sentinel_dated")
 
 OUTPUT = Path("data/processed")
@@ -85,7 +84,7 @@ def main():
             })
 
     if len(rows) == 0:
-        print("⚠ No data processed!")
+        print(" No data processed!")
         return
 
     df = pd.DataFrame(rows).sort_values("date")

@@ -2,7 +2,7 @@ import shutil
 from pathlib import Path
 
 SENTINEL_ROOT = Path("data/raw/sentinel")
-OUT = Path("data/raw/Oil Tanks/sentinel_images")
+OUT = Path("data/raw/sentinel_images")
 OUT.mkdir(parents=True, exist_ok=True)
 
 def extract_images():

@@ -19,9 +19,7 @@ def feature_selection():
     y = df["close_price"]
     X = df.drop(columns=["close_price"])
 
-    # ---------------------------------------
     # 1. Correlation Filter (remove collinear)
-    # ---------------------------------------
     corr = X.corr()
     upper = corr.where(np.triu(np.ones(corr.shape), k=1).astype(bool))
     to_drop = [
@@ -30,9 +28,7 @@ def feature_selection():
     ]
     X = X.drop(columns=to_drop)
 
-    # ---------------------------------------
     # 2. RandomForest Feature Importance
-    # ---------------------------------------
     rf = RandomForestRegressor(n_estimators=400, random_state=42)
     rf.fit(X, y)
 
@@ -43,9 +39,7 @@ def feature_selection():
 
     rf_imp.to_csv(SAVE_RF, index=False)
 
-    # ---------------------------------------
     # 3. XGBoost Feature Importance
-    # ---------------------------------------
     xgb = XGBRegressor(
         n_estimators=600,
         learning_rate=0.04,
@@ -64,9 +58,7 @@ def feature_selection():
 
     xgb_imp.to_csv(SAVE_XGB, index=False)
 
-    # ---------------------------------------
     # 4. Select top features
-    # ---------------------------------------
     top_rf = rf_imp.head(25)["feature"]
     top_xgb = xgb_imp.head(25)["feature"]
 

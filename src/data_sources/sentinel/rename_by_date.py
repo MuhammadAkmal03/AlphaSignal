@@ -13,7 +13,7 @@ def extract_date(json_path):
         data = json.load(f)
 
     # sentinelhub sometimes returns date in different fields
-    # we check all possible locations
+    # check all possible locations
     candidates = []
 
     def search(obj):
