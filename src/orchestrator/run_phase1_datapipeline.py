@@ -21,6 +21,11 @@ def run_phase1():
 
         # 2 — NLP
         # SRC / "data_sources" / "nlp" / "nlp_demand_score.py",
+        
+        # 2b — Real-time News Sentiment (fetches latest oil news)
+        SRC / "data_sources" / "nlp" / "realtime_oil_news.py",
+        
+        # 2c — Convert to daily and merge with news sentiment
         # SRC / "data_sources" / "nlp" / "nlp_daily_converter.py",
 
         # 3 — USO

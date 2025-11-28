@@ -21,3 +21,4 @@ tensorflow
 stable-baselines3
 gym
 gymnasium
+newsapi-python
