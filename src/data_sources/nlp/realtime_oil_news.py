@@ -16,6 +16,9 @@ import time
 # Load environment variables
 load_dotenv()
 
+# Fix for transformers/keras compatibility
+os.environ["TF_USE_LEGACY_KERAS"] = "1"
+
 # Directories
 RAW_NLP = Path("data/raw/nlp")
 RAW_NLP.mkdir(parents=True, exist_ok=True)
@@ -46,7 +49,12 @@ def get_sentiment_analyzer():
     global _sentiment_analyzer
     if _sentiment_analyzer is None:
         print(" Loading sentiment analysis model...")
-        _sentiment_analyzer = pipeline("sentiment-analysis", model="distilbert-base-uncased-finetuned-sst-2-english")
+        # Force PyTorch to avoid TensorFlow/Keras issues
+        _sentiment_analyzer = pipeline(
+            "sentiment-analysis", 
+            model="distilbert-base-uncased-finetuned-sst-2-english",
+            framework="pt"  # Explicitly use PyTorch
+        )
         print(" Sentiment model loaded")
     return _sentiment_analyzer
 

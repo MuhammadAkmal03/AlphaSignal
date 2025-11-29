@@ -26,13 +26,13 @@ def run_phase1():
         SRC / "data_sources" / "nlp" / "realtime_oil_news.py",
         
         # 2c — Convert to daily and merge with news sentiment
-        # SRC / "data_sources" / "nlp" / "nlp_daily_converter.py",
+        SRC / "data_sources" / "nlp" / "nlp_daily_converter.py",
 
         # 3 — USO
-        # SRC / "data_sources" / "uso" / "uso_fetcher.py",
+        SRC / "data_sources" / "uso" / "uso_fetcher.py",
 
         # 4 — EIA (your script fetches ALL)
-        # SRC / "data_sources" / "eia" / "eia_fetcher.py",
+        SRC / "data_sources" / "eia" / "eia_fetcher.py",
 
         # 5 — Sentinel & YOLO
         # SRC / "data_sources" / "sentinel" / "sentinel_refinery_fetcher.py",

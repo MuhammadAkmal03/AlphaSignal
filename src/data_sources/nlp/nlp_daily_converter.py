@@ -30,7 +30,7 @@ def convert_nlp_to_daily():
         news_end = news_df["date"].max()
         if news_end > end:
             end = news_end
-            print(f"✅ Extending date range to {end} using real-time news")
+            print(f" Extending date range to {end} using real-time news")
 
     daily_index = pd.date_range(start, end, freq="D")
     df_daily = pd.DataFrame({"date": daily_index})
@@ -44,7 +44,7 @@ def convert_nlp_to_daily():
 
     # Replace forward-filled values with real-time news sentiment
     if news_sentiment_file.exists():
-        print("✅ Loading real-time news sentiment to replace forward-filled values...")
+        print("Loading real-time news sentiment to replace forward-filled values...")
         news_df = pd.read_csv(news_sentiment_file)
         news_df["date"] = pd.to_datetime(news_df["date"])
         
@@ -62,18 +62,18 @@ def convert_nlp_to_daily():
         
         df_daily.loc[mask, "demand_score"] = df_daily.loc[mask, "news_sentiment"]
         
-        print(f"✅ Replaced {replaced_count} forward-filled values with real-time news sentiment")
+        print(f" Replaced {replaced_count} forward-filled values with real-time news sentiment")
         
         # Drop helper columns
         df_daily = df_daily.drop(columns=["is_original", "news_sentiment"])
     else:
-        print("⚠️  No real-time news sentiment found - using forward-fill only")
+        print("  No real-time news sentiment found - using forward-fill only")
         df_daily = df_daily.drop(columns=["is_original"])
 
     # Save
     df_daily.to_csv(outfile, index=False)
 
-    print(f"\n✅ Created DAILY NLP scores!")
+    print(f"\n Created DAILY NLP scores!")
     print(f"   Saved: {outfile}")
     print(f"   Date range: {df_daily['date'].min()} to {df_daily['date'].max()}")
     print(f"   Total days: {len(df_daily)}")

@@ -23,7 +23,7 @@ def run_phase2():
     for s in steps:
         run(s)
 
-    print("\n✔ PHASE 2 COMPLETE — MODEL TRAINED\n")
+    print("\n PHASE 2 COMPLETE — MODEL TRAINED\n")
 
 if __name__ == "__main__":
     run_phase2()

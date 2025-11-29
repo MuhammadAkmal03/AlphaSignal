@@ -23,7 +23,7 @@ def run_phase3():
     for s in steps:
         run(s)
 
-    print("\n✔ PHASE 3 COMPLETE — PREDICTION FINISHED\n")
+    print("\n PHASE 3 COMPLETE — PREDICTION FINISHED\n")
 
 if __name__ == "__main__":
     run_phase3()
