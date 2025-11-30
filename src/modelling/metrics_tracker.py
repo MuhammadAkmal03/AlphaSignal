@@ -7,16 +7,17 @@ OUT = Path("data/final/prediction/performance_metrics.csv")
 
 
 def update_metrics():
-    print("\n Updating performance metrics...")
+    print("\n📊 Updating performance metrics...")
 
     # --- Check prediction exists ---
     if not PRED.exists():
-        print(" No prediction log found. Skipping metrics update.")
+        print("   No prediction log found. Skipping metrics update.")
         return
 
     # --- Check actual file exists ---
     if not ACTUAL.exists():
-        print("⚠ No actuals available yet. Metrics cannot be updated today.")
+        print("   ⚠️  No actuals file yet. Metrics will be calculated once actual prices are available.")
+        print("   ✅ Prediction saved successfully!")
         return
 
     # Load both
@@ -24,8 +25,13 @@ def update_metrics():
     df_act = pd.read_csv(ACTUAL)
 
     # Align dates (actual is always 1 day behind prediction)
-    df_pred["date"] = pd.to_datetime(df_pred["date"])
-    df_act["date"] = pd.to_datetime(df_act["date"])
+    # Use coerce to handle any parsing errors gracefully
+    df_pred["date"] = pd.to_datetime(df_pred["date"], errors='coerce').dt.normalize()
+    df_act["date"] = pd.to_datetime(df_act["date"], errors='coerce').dt.normalize()
+    
+    # Drop any rows where date parsing failed
+    df_pred = df_pred.dropna(subset=["date"])
+    df_act = df_act.dropna(subset=["date"])
 
     df_pred["match_date"] = df_pred["date"] - pd.Timedelta(days=1)
 

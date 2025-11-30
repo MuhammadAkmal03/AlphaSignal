@@ -23,8 +23,13 @@ def generate_plot():
     df_pred = pd.read_csv(PRED)
     df_act = pd.read_csv(ACTUAL)
 
-    df_pred["date"] = pd.to_datetime(df_pred["date"])
-    df_act["date"] = pd.to_datetime(df_act["date"])
+    # Use coerce to handle any parsing errors gracefully
+    df_pred["date"] = pd.to_datetime(df_pred["date"], errors='coerce').dt.normalize()
+    df_act["date"] = pd.to_datetime(df_act["date"], errors='coerce').dt.normalize()
+    
+    # Drop any rows where date parsing failed
+    df_pred = df_pred.dropna(subset=["date"])
+    df_act = df_act.dropna(subset=["date"])
 
     # Match previous day's prediction to the actual price
     df_pred["match_date"] = df_pred["date"] - pd.Timedelta(days=1)

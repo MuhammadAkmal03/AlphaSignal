@@ -19,3 +19,5 @@ notebooks/
 weights/
 
 logs/
+
+backtest_results/
