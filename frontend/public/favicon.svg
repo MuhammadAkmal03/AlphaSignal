@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f4d03f"/>
+      <stop offset="100%" style="stop-color:#d4af37"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Oil Drop -->
+  <path d="M 16 8 C 13 10, 12 13, 12 17 C 12 21, 14 24, 16 25 C 18 24, 20 21, 20 17 C 20 13, 19 10, 16 8 Z" 
+        fill="url(#g)" stroke="#b8941e" stroke-width="0.8"/>
+  
+  <!-- Letter A -->
+  <path d="M 16 14 L 13.5 21 L 15 21 L 15.5 19.5 L 16.5 19.5 L 17 21 L 18.5 21 Z" 
+        fill="white"/>
+  <rect x="15.2" y="17.5" width="1.6" height="1" fill="white"/>
+  
+  <!-- Arrow -->
+  <line x1="21" y1="18" x2="27" y2="12" stroke="#2563eb" stroke-width="1.5" stroke-linecap="round"/>
+  <path d="M 27 12 L 24 14 L 25.5 15.5 Z" fill="#2563eb"/>
+</svg>

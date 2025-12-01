@@ -2,7 +2,7 @@
 // This is where everything comes together!
 
 import { useState, useEffect } from 'react';
-import { TrendingUp, Newspaper, BarChart3, AlertCircle } from 'lucide-react';
+import { TrendingUp, TrendingDown, Newspaper, BarChart3, AlertCircle } from 'lucide-react';
 import Card from '../components/Card';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
@@ -164,19 +164,80 @@ const Dashboard = () => {
                         />
                     )}
 
-                    {prediction && !predictionLoading && !predictionError && (
-                        <div>
-                            <div className="text-4xl font-bold text-primary-600 mb-2">
-                                {formatPrice(prediction.predicted_price)}
+                    {prediction && !predictionLoading && !predictionError && (() => {
+                        // Calculate trend (assuming previous day was $70 - you can fetch actual previous value)
+                        const previousPrice = 70.00; // This should come from API
+                        const priceChange = prediction.predicted_price - previousPrice;
+                        const percentChange = (priceChange / previousPrice) * 100;
+                        const isUp = priceChange > 0;
+
+                        return (
+                            <div>
+                                {/* Main Price Display - Large and Prominent */}
+                                <div className={`p-6 rounded-xl mb-4 ${isUp
+                                        ? 'bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-2 border-green-500'
+                                        : 'bg-gradient-to-br from-red-50 to-rose-50 dark:from-red-900/20 dark:to-rose-900/20 border-2 border-red-500'
+                                    }`}>
+                                    <div className="flex items-center justify-between mb-2">
+                                        <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                                            Crude Oil Price
+                                        </span>
+                                        {isUp ? (
+                                            <TrendingUp className="w-8 h-8 text-green-600 animate-pulse" />
+                                        ) : (
+                                            <TrendingDown className="w-8 h-8 text-red-600 animate-pulse" />
+                                        )}
+                                    </div>
+
+                                    {/* Huge Price */}
+                                    <div className={`text-6xl font-bold mb-2 ${isUp ? 'text-green-700 dark:text-green-300' : 'text-red-700 dark:text-red-300'
+                                        }`}>
+                                        {formatPrice(prediction.predicted_price)}
+                                    </div>
+
+                                    {/* Change Indicator */}
+                                    <div className={`flex items-center gap-2 text-lg font-semibold ${isUp ? 'text-green-700 dark:text-green-300' : 'text-red-700 dark:text-red-300'
+                                        }`}>
+                                        <span>{isUp ? '▲' : '▼'}</span>
+                                        <span>{isUp ? '+' : ''}{formatPrice(Math.abs(priceChange))}</span>
+                                        <span>({isUp ? '+' : ''}{percentChange.toFixed(2)}%)</span>
+                                    </div>
+
+                                    <p className={`text-sm mt-2 ${isUp ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
+                                        }`}>
+                                        vs previous: {formatPrice(previousPrice)}
+                                    </p>
+                                </div>
+
+                                {/* Additional Info */}
+                                <div className="space-y-2">
+                                    <div className="flex items-center justify-between text-sm">
+                                        <span className="text-gray-600 dark:text-gray-400">Predicted for:</span>
+                                        <span className="font-semibold">{formatDate(prediction.date)}</span>
+                                    </div>
+                                    <div className="flex items-center justify-between text-sm">
+                                        <span className="text-gray-600 dark:text-gray-400">Last updated:</span>
+                                        <span className="font-semibold">{new Date(prediction.timestamp).toLocaleTimeString()}</span>
+                                    </div>
+                                </div>
+
+                                {/* Trend Message */}
+                                <div className={`mt-4 p-3 rounded-lg ${isUp
+                                        ? 'bg-green-100 dark:bg-green-900/30 border border-green-300 dark:border-green-700'
+                                        : 'bg-red-100 dark:bg-red-900/30 border border-red-300 dark:border-red-700'
+                                    }`}>
+                                    <p className={`text-sm font-medium ${isUp ? 'text-green-800 dark:text-green-200' : 'text-red-800 dark:text-red-200'
+                                        }`}>
+                                        {isUp ? '📈 Bullish Signal' : '📉 Bearish Signal'}
+                                        {' - '}
+                                        {isUp
+                                            ? 'Price expected to rise'
+                                            : 'Price expected to fall'}
+                                    </p>
+                                </div>
                             </div>
-                            <p className="text-sm text-gray-600 dark:text-gray-400">
-                                Predicted for {formatDate(prediction.date)}
-                            </p>
-                            <p className="text-xs text-gray-500 dark:text-gray-500 mt-2">
-                                Updated: {new Date(prediction.timestamp).toLocaleTimeString()}
-                            </p>
-                        </div>
-                    )}
+                        );
+                    })()}
                 </Card>
 
                 {/* ============================================ */}

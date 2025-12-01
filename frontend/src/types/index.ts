@@ -55,7 +55,7 @@ export interface ModelMetrics {
 
 // RL Agent Types
 export interface RLRecommendation {
-    action: 'BUY' | 'SELL' | 'HOLD';
+    action: 'LONG' | 'SHORT' | 'HOLD';
     confidence: number;
     reasoning: string;
 }
@@ -66,6 +66,32 @@ export interface RLPerformance {
     sharpe_ratio: number;
     max_drawdown: number;
     total_costs: number;
+}
+
+export interface EquityDataPoint {
+    step: number;
+    net_equity: number;
+    gross_equity: number;
+}
+
+export interface EquityCurveData {
+    data: EquityDataPoint[];
+    summary: {
+        initial_equity: number;
+        final_equity: number;
+        peak_equity: number;
+        data_points: number;
+    };
+}
+
+export interface Trade {
+    date?: string;
+    step: number;
+    action: number;
+    position: number;
+    price: number;
+    net_return: number;
+    cumulative_return: number;
 }
 
 // Backtest Types
