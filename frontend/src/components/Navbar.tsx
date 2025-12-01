@@ -11,7 +11,7 @@ const Navbar = () => {
         { path: '/dashboard', label: 'Dashboard' },
         { path: '/backtest', label: 'Backtesting' },
         { path: '/rl-agent', label: 'RL Agent' },
-        { path: '/methodology', label: 'Methodology' },
+        { path: '/analytics', label: 'Analytics' },
         { path: '/about', label: 'About' },
     ];
 

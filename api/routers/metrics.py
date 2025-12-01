@@ -39,11 +39,13 @@ async def get_model_metrics():
         
         metrics = df.iloc[-1]
         
-        # Get total predictions count
+        # Get total predictions count (unique dates only)
         pred_count = 0
         if PREDICTION_LOG.exists():
             pred_df = pd.read_csv(PREDICTION_LOG)
-            pred_count = len(pred_df)
+            # Count unique dates instead of total rows
+            pred_df['date'] = pd.to_datetime(pred_df['date'], errors='coerce').dt.normalize()
+            pred_count = pred_df['date'].nunique()  # nunique() = number of unique values
         
         return ModelMetrics(
             mae=float(metrics['MAE']),

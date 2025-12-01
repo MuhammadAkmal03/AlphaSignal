@@ -66,24 +66,33 @@ async def get_prediction_history(days: Optional[int] = 30):
             raise HTTPException(status_code=404, detail="Prediction log not found")
         
         df = pd.read_csv(PREDICTION_LOG)
-        df['date'] = pd.to_datetime(df['date'])
+        # Handle mixed date formats (timestamps and dates)
+        df['date'] = pd.to_datetime(df['date'], format='mixed', errors='coerce')
         
-        # Filter by days
-        if days:
-            cutoff = datetime.now() - timedelta(days=days)
-            df = df[df['date'] >= cutoff]
-        
-        # Sort by date descending
+        # Sort by date descending (most recent first)
         df = df.sort_values('date', ascending=False)
         
-        predictions = [
-            PredictionResponse(
-                date=row['date'].strftime('%Y-%m-%d'),
-                predicted_price=float(row['predicted']),
-                timestamp=row['date'].isoformat()
-            )
-            for _, row in df.iterrows()
-        ]
+        # Get the most recent N predictions (where N = days parameter)
+        # This works regardless of whether dates are in past or future
+        df = df.head(days)
+        
+        # Handle NaNs in predicted column
+        df['predicted'] = df['predicted'].fillna(0.0)
+        
+        predictions = []
+        for _, row in df.iterrows():
+            try:
+                if pd.isna(row['date']):
+                    continue
+                    
+                predictions.append(PredictionResponse(
+                    date=row['date'].strftime('%Y-%m-%d'),
+                    predicted_price=float(row['predicted']),
+                    timestamp=row['date'].isoformat()
+                ))
+            except Exception as e:
+                print(f"Skipping row due to error: {e}")
+                continue
         
         return PredictionHistoryResponse(
             predictions=predictions,

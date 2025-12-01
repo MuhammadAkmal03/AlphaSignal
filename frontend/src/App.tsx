@@ -4,7 +4,7 @@ import LandingPage from './pages/LandingPage'
 import Dashboard from './pages/Dashboard'
 import Backtesting from './pages/Backtesting'
 import RLAgent from './pages/RLAgent'
-import Methodology from './pages/Methodology'
+import Analytics from './pages/Analytics'
 import About from './pages/About'
 
 function App() {
@@ -17,7 +17,7 @@ function App() {
                     <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/backtest" element={<Backtesting />} />
                     <Route path="/rl-agent" element={<RLAgent />} />
-                    <Route path="/methodology" element={<Methodology />} />
+                    <Route path="/analytics" element={<Analytics />} />
                     <Route path="/about" element={<About />} />
                 </Routes>
             </div>
