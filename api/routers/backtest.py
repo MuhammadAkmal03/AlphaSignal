@@ -29,6 +29,8 @@ class BacktestResponse(BaseModel):
     accuracy_metrics: dict
     trading_metrics: dict
     buy_hold_metrics: dict
+    equity_curve: list
+    trades: list
     data_points: int
     timestamp: str
 
@@ -49,10 +51,31 @@ async def run_backtest(request: BacktestRequest):
             request.initial_capital
         )
         
+        # Calculate drawdown for equity curve
+        # Note: daily_return is already calculated in calculate_trading_metrics but not in trading_df returned
+        trading_df['daily_return'] = trading_df['portfolio_value'].pct_change()
+        cumulative_returns = (1 + trading_df['daily_return']).cumprod()
+        running_max = cumulative_returns.cummax()
+        drawdown = (cumulative_returns - running_max) / running_max * 100
+        trading_df['drawdown'] = drawdown.fillna(0)
+        
+        # Prepare equity curve data
+        equity_curve = trading_df[['date', 'portfolio_value', 'drawdown']].rename(
+            columns={'portfolio_value': 'value'}
+        ).to_dict(orient='records')
+        
+        # Prepare trades data (filter for active trades)
+        trades_df = trading_df[trading_df['action'].isin(['BUY', 'SELL'])].copy()
+        trades = trades_df[['date', 'action', 'price', 'return_pct']].rename(
+            columns={'return_pct': 'return'}
+        ).to_dict(orient='records')
+        
         return BacktestResponse(
             accuracy_metrics=accuracy_metrics,
             trading_metrics=strategy_metrics,
             buy_hold_metrics=bnh_metrics,
+            equity_curve=equity_curve,
+            trades=trades,
             data_points=len(accuracy_df),
             timestamp=pd.Timestamp.now().isoformat()
         )

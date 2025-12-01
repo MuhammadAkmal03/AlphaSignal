@@ -17,7 +17,7 @@ def run_phase1():
     steps = [
 
         # 1 — AIS
-        # SRC / "data_sources" / "ais" / "ais_stream.py",
+        SRC / "data_sources" / "ais" / "ais_stream.py",
 
         # 2 — NLP
         # SRC / "data_sources" / "nlp" / "nlp_demand_score.py",

@@ -19,6 +19,7 @@ import type { Prediction, NewsArticle, ModelMetrics } from '../types';
 const Dashboard = () => {
     // State for prediction data
     const [prediction, setPrediction] = useState<Prediction | null>(null);
+    const [previousPrediction, setPreviousPrediction] = useState<Prediction | null>(null);
     const [predictionLoading, setPredictionLoading] = useState(true);
     const [predictionError, setPredictionError] = useState<string | null>(null);
 
@@ -53,6 +54,15 @@ const Dashboard = () => {
         try {
             const response = await getPredictions.latest();
             setPrediction(response.data);
+
+            // Also load previous prediction for comparison
+            try {
+                const prevResponse = await getPredictions.previous();
+                setPreviousPrediction(prevResponse.data);
+            } catch (prevError) {
+                console.log('Previous prediction not available:', prevError);
+            }
+
             setPredictionError(null);
         } catch (error) {
             console.error('Failed to load prediction:', error);
@@ -165,18 +175,18 @@ const Dashboard = () => {
                     )}
 
                     {prediction && !predictionLoading && !predictionError && (() => {
-                        // Calculate trend (assuming previous day was $70 - you can fetch actual previous value)
-                        const previousPrice = 70.00; // This should come from API
+                        // Calculate trend using actual previous prediction
+                        const previousPrice = previousPrediction?.predicted_price || prediction.predicted_price;
                         const priceChange = prediction.predicted_price - previousPrice;
-                        const percentChange = (priceChange / previousPrice) * 100;
+                        const percentChange = previousPrice > 0 ? (priceChange / previousPrice) * 100 : 0;
                         const isUp = priceChange > 0;
 
                         return (
                             <div>
                                 {/* Main Price Display - Large and Prominent */}
                                 <div className={`p-6 rounded-xl mb-4 ${isUp
-                                        ? 'bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-2 border-green-500'
-                                        : 'bg-gradient-to-br from-red-50 to-rose-50 dark:from-red-900/20 dark:to-rose-900/20 border-2 border-red-500'
+                                    ? 'bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-2 border-green-500'
+                                    : 'bg-gradient-to-br from-red-50 to-rose-50 dark:from-red-900/20 dark:to-rose-900/20 border-2 border-red-500'
                                     }`}>
                                     <div className="flex items-center justify-between mb-2">
                                         <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
@@ -223,8 +233,8 @@ const Dashboard = () => {
 
                                 {/* Trend Message */}
                                 <div className={`mt-4 p-3 rounded-lg ${isUp
-                                        ? 'bg-green-100 dark:bg-green-900/30 border border-green-300 dark:border-green-700'
-                                        : 'bg-red-100 dark:bg-red-900/30 border border-red-300 dark:border-red-700'
+                                    ? 'bg-green-100 dark:bg-green-900/30 border border-green-300 dark:border-green-700'
+                                    : 'bg-red-100 dark:bg-red-900/30 border border-red-300 dark:border-red-700'
                                     }`}>
                                     <p className={`text-sm font-medium ${isUp ? 'text-green-800 dark:text-green-200' : 'text-red-800 dark:text-red-200'
                                         }`}>

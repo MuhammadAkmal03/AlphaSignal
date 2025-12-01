@@ -10,6 +10,7 @@ const api = axios.create({
 // Predictions
 export const getPredictions = {
     latest: () => api.get('/predictions/latest'),
+    previous: () => api.get('/predictions/previous'),
     history: (days: number = 30) => api.get(`/predictions/history?days=${days}`),
     stats: () => api.get('/predictions/stats'),
 };

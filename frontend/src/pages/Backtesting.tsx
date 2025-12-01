@@ -7,7 +7,7 @@ import ErrorMessage from '../components/ErrorMessage';
 import { getBacktest } from '../api/client';
 
 interface BacktestResults {
-    prediction_metrics: {
+    accuracy_metrics: {
         mae: number;
         rmse: number;
         mape: number;
@@ -219,16 +219,16 @@ const Backtesting = () => {
                         <div className="grid md:grid-cols-3 gap-4">
                             <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                                 <p className="text-sm text-gray-600 dark:text-gray-400">MAE</p>
-                                <p className="text-2xl font-bold">${results.prediction_metrics.mae.toFixed(2)}</p>
+                                <p className="text-2xl font-bold">${results.accuracy_metrics.mae.toFixed(2)}</p>
                             </div>
                             <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                                 <p className="text-sm text-gray-600 dark:text-gray-400">MAPE</p>
-                                <p className="text-2xl font-bold">{results.prediction_metrics.mape.toFixed(2)}%</p>
+                                <p className="text-2xl font-bold">{results.accuracy_metrics.mape.toFixed(2)}%</p>
                             </div>
                             <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                                 <p className="text-sm text-gray-600 dark:text-gray-400">Directional Accuracy</p>
                                 <p className="text-2xl font-bold text-green-600">
-                                    {results.prediction_metrics.directional_accuracy.toFixed(1)}%
+                                    {results.accuracy_metrics.directional_accuracy.toFixed(1)}%
                                 </p>
                             </div>
                         </div>

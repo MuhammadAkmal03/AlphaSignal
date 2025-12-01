@@ -58,6 +58,37 @@ async def get_latest_prediction():
         raise HTTPException(status_code=500, detail=f"Error loading prediction: {str(e)}")
 
 
+@router.get("/previous", response_model=PredictionResponse)
+async def get_previous_prediction():
+    """Get the second-to-last prediction (for comparison with latest)"""
+    try:
+        if not PREDICTION_LOG.exists():
+            raise HTTPException(status_code=404, detail="Prediction log not found")
+        
+        df = pd.read_csv(PREDICTION_LOG)
+        if len(df) < 2:
+            # If we don't have 2 predictions yet, return the first one
+            if not df.empty:
+                latest = df.iloc[-1]
+                return PredictionResponse(
+                    date=str(latest['date']),
+                    predicted_price=float(latest['predicted']),
+                    timestamp=datetime.now().isoformat()
+                )
+            raise HTTPException(status_code=404, detail="Not enough predictions available")
+        
+        # Get second-to-last prediction
+        previous = df.iloc[-2]
+        return PredictionResponse(
+            date=str(previous['date']),
+            predicted_price=float(previous['predicted']),
+            timestamp=datetime.now().isoformat()
+        )
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error loading previous prediction: {str(e)}")
+
+
 @router.get("/history", response_model=PredictionHistoryResponse)
 async def get_prediction_history(days: Optional[int] = 30):
     """Get historical predictions"""
