@@ -6,6 +6,7 @@ import { TrendingUp, Newspaper, BarChart3, AlertCircle } from 'lucide-react';
 import Card from '../components/Card';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
+import NewsSummary from '../components/NewsSummary';
 import { getPredictions, getNews, getMetrics } from '../api/client';
 import type { Prediction, NewsArticle, ModelMetrics } from '../types';
 
@@ -260,6 +261,11 @@ const Dashboard = () => {
                         <p className="text-gray-500 text-center py-4">No news available</p>
                     )}
                 </Card>
+            </div>
+
+            {/* AI News Summary Section */}
+            <div className="mt-8">
+                <NewsSummary />
             </div>
 
             {/* Info Section */}

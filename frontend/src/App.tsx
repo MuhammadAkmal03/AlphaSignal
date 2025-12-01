@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import Navbar from './components/Navbar'
+import Chatbot from './components/Chatbot'
 import LandingPage from './pages/LandingPage'
 import Dashboard from './pages/Dashboard'
 import Backtesting from './pages/Backtesting'
@@ -20,6 +21,8 @@ function App() {
                     <Route path="/analytics" element={<Analytics />} />
                     <Route path="/about" element={<About />} />
                 </Routes>
+                {/* Chatbot available on all pages */}
+                <Chatbot />
             </div>
         </Router>
     )

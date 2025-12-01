@@ -12,7 +12,7 @@ from pathlib import Path
 # Add api directory to path
 sys.path.insert(0, str(Path(__file__).parent))
 
-from routers import predictions, backtest, rl_agent, news, metrics
+from routers import predictions, backtest, rl_agent, news, metrics, ai_news, chatbot
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -38,6 +38,8 @@ app.include_router(backtest.router, prefix="/api/backtest", tags=["Backtesting"]
 app.include_router(rl_agent.router, prefix="/api/rl", tags=["RL Agent"])
 app.include_router(news.router, prefix="/api/news", tags=["News"])
 app.include_router(metrics.router, prefix="/api/metrics", tags=["Metrics"])
+app.include_router(ai_news.router, prefix="/api/ai-news", tags=["AI News"])
+app.include_router(chatbot.router, prefix="/api/chatbot", tags=["Chatbot"])
 
 
 @app.get("/")
