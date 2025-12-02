@@ -1,23 +1,63 @@
+# Python
+*.log
+*.pkl 
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Virtual Environment
+venv/
+env/
+ENV/
+
+# Environment Variables
+*.env
+.env.local
+.env.*.local
+
+# Data & Models (large files)
+/data/raw 
+data/
+models/
+weights/
+notebooks/
+logs/
+backtest_results/
+
+# Test & Debug Files
+test_*.py
+*_test.py
+debug_*.py
+extract_feature_names.py
+error_log.txt
 *.log
 
-*.pkl 
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
 
-/data/raw 
+# OS
+.DS_Store
+Thumbs.db
 
-__pycache__
+# Build & Distribution
+dist/
+build/
+*.egg-info/
+.eggs/
 
-venv/
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/.env.local
 
-*.env 
-
-models/
-
-data/
-
-notebooks/
-
-weights/
-
-logs/
-
-backtest_results/
+# Temporary files
+*.tmp
+*.temp
+.cache/

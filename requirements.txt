@@ -1,24 +1,50 @@
+# Backend API
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+pydantic==2.5.0
+python-dotenv
+groq
+email-validator
+python-multipart==0.0.6
+
+# Data Processing
 yfinance
 pandas
-requests
-python-dotenv
-websocket-client
-opencv-python
-transformers
-torch
+numpy
 pyarrow
+
+# HTTP & WebSocket
+requests
+websocket-client
+
+# Machine Learning
 xgboost
 scikit-learn
 shap
-Pillow
-sentinelsat
-rasterio
-numpy
-sentinelhub
-ultralytics
-seaborn
 tensorflow
+torch
+transformers
+
+# Reinforcement Learning
 stable-baselines3
 gym
 gymnasium
+
+# Computer Vision 
+opencv-python
+Pillow
+ultralytics
+
+# Geospatial 
+sentinelsat
+rasterio
+sentinelhub
+
+# Visualization
+seaborn
+
+# News API
 newsapi-python
+
+# Production Server 
+gunicorn==21.2.0
