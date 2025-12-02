@@ -1,0 +1,85 @@
+name: Deploy Backend to Cloud Run
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'api/**'
+      - '.github/workflows/deploy-backend.yml'
+  workflow_dispatch:  # Allow manual trigger
+
+env:
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  REGION: asia-south1
+  SERVICE_NAME: alphasignal-backend
+
+jobs:
+  deploy:
+    name: Deploy Backend
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          cd api
+          pip install -r requirements.txt
+
+      # Optional: Run tests
+      # - name: Run tests
+      #   run: |
+      #     cd api
+      #     pytest tests/
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+
+      - name: Configure Docker for GCP
+        run: |
+          gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
+
+      - name: Build and Deploy to Cloud Run
+        run: |
+          gcloud run deploy ${{ env.SERVICE_NAME }} \
+            --source ./api \
+            --platform managed \
+            --region ${{ env.REGION }} \
+            --allow-unauthenticated \
+            --memory 1Gi \
+            --cpu 1 \
+            --timeout 300 \
+            --max-instances 10 \
+            --set-env-vars ENVIRONMENT=production \
+            --set-env-vars GROQ_API_KEY=${{ secrets.GROQ_API_KEY }} \
+            --set-env-vars SMTP_SERVER=${{ secrets.SMTP_SERVER }} \
+            --set-env-vars SMTP_PORT=${{ secrets.SMTP_PORT }} \
+            --set-env-vars SENDER_EMAIL=${{ secrets.SENDER_EMAIL }} \
+            --set-env-vars SENDER_PASSWORD=${{ secrets.SENDER_PASSWORD }}
+
+      - name: Get Service URL
+        run: |
+          SERVICE_URL=$(gcloud run services describe ${{ env.SERVICE_NAME }} \
+            --region ${{ env.REGION }} \
+            --format 'value(status.url)')
+          echo "Backend deployed to: $SERVICE_URL"
+          echo "BACKEND_URL=$SERVICE_URL" >> $GITHUB_ENV
+
+      - name: Deployment Summary
+        run: |
+          echo "Backend deployed successfully!"
+          echo "URL: ${{ env.BACKEND_URL }}"
+          echo "Region: ${{ env.REGION }}"
+          echo "Service: ${{ env.SERVICE_NAME }}"
