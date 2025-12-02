@@ -12,8 +12,15 @@ import sys
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from src.backtesting.backtest_accuracy import run_accuracy_backtest
-from src.backtesting.backtest_trading import run_trading_backtest, calculate_buy_and_hold
+# Try to import backtesting functions (optional for deployment)
+try:
+    from src.backtesting.backtest_accuracy import run_accuracy_backtest
+    from src.backtesting.backtest_trading import run_trading_backtest, calculate_buy_and_hold
+    BACKTESTING_AVAILABLE = True
+except ImportError:
+    BACKTESTING_AVAILABLE = False
+    print("Warning: Backtesting modules not available. Backtest endpoints will return 503.")
+
 
 router = APIRouter()
 
@@ -38,6 +45,12 @@ class BacktestResponse(BaseModel):
 @router.post("/run", response_model=BacktestResponse)
 async def run_backtest(request: BacktestRequest):
     """Run a complete backtest"""
+    if not BACKTESTING_AVAILABLE:
+        raise HTTPException(
+            status_code=503,
+            detail="Backtesting functionality not available in this deployment"
+        )
+    
     try:
         # Run accuracy backtest
         accuracy_metrics, accuracy_df = run_accuracy_backtest(request.lookback_days)

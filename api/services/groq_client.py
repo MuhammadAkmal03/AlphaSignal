@@ -9,8 +9,9 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
-# Initialize Groq client
-client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+# Initialize Groq client (optional - will be None if API key not set)
+api_key = os.getenv("GROQ_API_KEY")
+client = Groq(api_key=api_key) if api_key else None
 
 
 def generate_news_summary(news_articles: list) -> dict:
@@ -23,6 +24,14 @@ def generate_news_summary(news_articles: list) -> dict:
     Returns:
         dict with summary, key_topics, sentiment_overview
     """
+    # Check if client is available
+    if not client:
+        return {
+            "summary": "AI summarization not available. Please configure GROQ_API_KEY.",
+            "key_topics": ["Oil Markets"],
+            "sentiment_overview": "Neutral"
+        }
+    
     # Format articles for prompt
     articles_text = "\n".join([
         f"- {article['title']} (Sentiment: {article.get('sentiment', 'neutral')})"
@@ -99,6 +108,10 @@ def chat_completion(message: str, context: dict, history: list = None) -> str:
     Returns:
         AI response string
     """
+    # Check if client is available
+    if not client:
+        return "Chatbot is not available. Please configure GROQ_API_KEY environment variable."
+    
     # Build system prompt with context
     system_prompt = f"""You are AlphaSignal Assistant, an AI helper for the AlphaSignal crude oil price prediction system.
 

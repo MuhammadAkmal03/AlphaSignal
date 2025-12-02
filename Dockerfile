@@ -10,22 +10,25 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements and install dependencies
-COPY requirements.txt .
+COPY api/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy application code
-COPY . .
+# Copy src folder (needed for imports)
+COPY src ./src
 
-# Copy src folder from parent directory (needed for imports)
-COPY ../src ./src
+# Copy api folder
+COPY api ./api
+
+# Set working directory to api
+WORKDIR /app/api
 
 # Create necessary directories
 RUN mkdir -p data/final/prediction data/final/shap models logs
 
-# Set Python path to include parent directory
+# Set Python path
 ENV PYTHONPATH=/app:$PYTHONPATH
 
-# Expose port (Cloud Run will set PORT env variable to 8080)
+# Expose port
 EXPOSE 8080
 
 # Run the application
