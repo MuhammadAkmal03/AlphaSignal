@@ -147,18 +147,18 @@ const Dashboard = () => {
     // It looks like HTML but it's actually JavaScript (JSX)
 
     return (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             {/* Page Header */}
-            <div className="mb-8 flex items-center justify-between">
+            <div className="mb-10 flex items-center justify-between">
                 <div>
-                    <h1 className="text-4xl font-bold mb-2">Dashboard</h1>
-                    <p className="text-gray-600 dark:text-gray-400">
+                    <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-primary-600 to-primary-800 bg-clip-text text-transparent">Dashboard</h1>
+                    <p className="text-gray-600 dark:text-gray-400 text-lg">
                         Live predictions, news sentiment, and model performance
                     </p>
                 </div>
                 <button
                     onClick={() => setIsEmailModalOpen(true)}
-                    className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg font-semibold hover:bg-primary-700 transition-colors"
+                    className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-lg font-semibold hover:shadow-lg hover:scale-105 transition-all duration-200"
                 >
                     <Mail className="w-5 h-5" />
                     Get Email Report
@@ -166,14 +166,16 @@ const Dashboard = () => {
             </div>
 
             {/* Grid Layout - Responsive */}
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
 
                 {/* ============================================ */}
                 {/* PREDICTION CARD */}
                 {/* ============================================ */}
-                <Card className="lg:col-span-1">
-                    <div className="flex items-center mb-4">
-                        <TrendingUp className="w-6 h-6 text-primary-600 mr-2" />
+                <Card className="lg:col-span-1 hover:shadow-xl transition-shadow duration-300">
+                    <div className="flex items-center mb-6">
+                        <div className="p-2 bg-primary-100 dark:bg-primary-900/30 rounded-lg mr-3">
+                            <TrendingUp className="w-6 h-6 text-primary-600 dark:text-primary-400" />
+                        </div>
                         <h2 className="text-xl font-semibold">Latest Prediction</h2>
                     </div>
 
@@ -197,9 +199,9 @@ const Dashboard = () => {
                         return (
                             <div>
                                 {/* Main Price Display - Large and Prominent */}
-                                <div className={`p-6 rounded-xl mb-4 ${isUp
-                                    ? 'bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-2 border-green-500'
-                                    : 'bg-gradient-to-br from-red-50 to-rose-50 dark:from-red-900/20 dark:to-rose-900/20 border-2 border-red-500'
+                                <div className={`p-6 rounded-xl mb-4 transition-all duration-300 ${isUp
+                                    ? 'bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-2 border-green-400/50 shadow-green-100 dark:shadow-green-900/20 shadow-lg'
+                                    : 'bg-gradient-to-br from-red-50 to-rose-50 dark:from-red-900/20 dark:to-rose-900/20 border-2 border-red-400/50 shadow-red-100 dark:shadow-red-900/20 shadow-lg'
                                     }`}>
                                     <div className="flex items-center justify-between mb-2">
                                         <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
@@ -266,9 +268,11 @@ const Dashboard = () => {
                 {/* ============================================ */}
                 {/* MODEL METRICS CARD */}
                 {/* ============================================ */}
-                <Card className="lg:col-span-1">
-                    <div className="flex items-center mb-4">
-                        <BarChart3 className="w-6 h-6 text-primary-600 mr-2" />
+                <Card className="lg:col-span-1 hover:shadow-xl transition-shadow duration-300">
+                    <div className="flex items-center mb-6">
+                        <div className="p-2 bg-primary-100 dark:bg-primary-900/30 rounded-lg mr-3">
+                            <BarChart3 className="w-6 h-6 text-primary-600 dark:text-primary-400" />
+                        </div>
                         <h2 className="text-xl font-semibold">Model Performance</h2>
                     </div>
 
@@ -282,18 +286,18 @@ const Dashboard = () => {
                     )}
 
                     {metrics && !metricsLoading && !metricsError && (
-                        <div className="space-y-3">
-                            <div className="flex justify-between items-center">
-                                <span className="text-gray-600 dark:text-gray-400">MAE</span>
-                                <span className="font-semibold">${metrics.mae.toFixed(2)}</span>
+                        <div className="space-y-4">
+                            <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                                <span className="text-gray-600 dark:text-gray-400 font-medium">MAE</span>
+                                <span className="font-bold text-lg">${metrics.mae.toFixed(2)}</span>
                             </div>
-                            <div className="flex justify-between items-center">
-                                <span className="text-gray-600 dark:text-gray-400">MAPE</span>
-                                <span className="font-semibold">{metrics.mape.toFixed(2)}%</span>
+                            <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                                <span className="text-gray-600 dark:text-gray-400 font-medium">MAPE</span>
+                                <span className="font-bold text-lg">{metrics.mape.toFixed(2)}%</span>
                             </div>
-                            <div className="flex justify-between items-center">
-                                <span className="text-gray-600 dark:text-gray-400">Total Predictions</span>
-                                <span className="font-semibold">{metrics.total_predictions}</span>
+                            <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                                <span className="text-gray-600 dark:text-gray-400 font-medium">Total Predictions</span>
+                                <span className="font-bold text-lg">{metrics.total_predictions}</span>
                             </div>
                         </div>
                     )}
@@ -302,9 +306,11 @@ const Dashboard = () => {
                 {/* ============================================ */}
                 {/* NEWS SENTIMENT CARD */}
                 {/* ============================================ */}
-                <Card className="lg:col-span-1">
-                    <div className="flex items-center mb-4">
-                        <Newspaper className="w-6 h-6 text-primary-600 mr-2" />
+                <Card className="lg:col-span-1 hover:shadow-xl transition-shadow duration-300">
+                    <div className="flex items-center mb-6">
+                        <div className="p-2 bg-primary-100 dark:bg-primary-900/30 rounded-lg mr-3">
+                            <Newspaper className="w-6 h-6 text-primary-600 dark:text-primary-400" />
+                        </div>
                         <h2 className="text-xl font-semibold">News Sentiment</h2>
                     </div>
 
@@ -318,12 +324,12 @@ const Dashboard = () => {
                     )}
 
                     {news.length > 0 && !newsLoading && !newsError && (
-                        <div className="space-y-3 max-h-64 overflow-y-auto">
+                        <div className="space-y-3 max-h-64 overflow-y-auto custom-scrollbar">
                             {/* Array.map() - Loop through news articles */}
                             {news.map((article, index) => (
                                 <div
                                     key={index}
-                                    className="pb-3 border-b border-gray-200 dark:border-gray-700 last:border-0"
+                                    className="pb-3 border-b border-gray-200 dark:border-gray-700 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-800/30 p-2 rounded-lg transition-colors"
                                 >
                                     <p className="text-sm font-medium mb-1 line-clamp-2">
                                         {article.title}
@@ -353,9 +359,9 @@ const Dashboard = () => {
             </div>
 
             {/* Info Section */}
-            <div className="mt-8 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+            <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl border border-blue-200 dark:border-blue-800 shadow-sm">
                 <div className="flex items-start">
-                    <AlertCircle className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 mr-3" />
+                    <AlertCircle className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 mr-3 flex-shrink-0" />
                     <div>
                         <p className="text-sm text-blue-800 dark:text-blue-200">
                             <strong>Dashboard Updates:</strong> Data is fetched from the FastAPI backend when the page loads.

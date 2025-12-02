@@ -20,7 +20,7 @@ const Navbar = () => {
     const isActive = (path: string) => location.pathname === path;
 
     return (
-        <nav className="sticky top-0 z-50 glass-card border-b">
+        <nav className="sticky top-0 z-50 glass-card border-b shadow-sm">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between items-center h-16">
                     {/* Logo */}
@@ -29,25 +29,38 @@ const Navbar = () => {
                         <span className="text-xl font-bold text-gradient">AlphaSignal</span>
                     </Link>
 
-                    {/* Desktop Navigation */}
-                    <div className="hidden md:flex space-x-1">
+                    {/* Desktop Navigation - Right Aligned */}
+                    <div className="hidden md:flex items-center space-x-1">
                         {navLinks.map((link) => (
                             <Link
                                 key={link.path}
                                 to={link.path}
-                                className={`px-4 py-2 rounded-lg font-medium transition-colors ${isActive(link.path)
-                                    ? 'bg-primary-600 text-white'
+                                className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${isActive(link.path)
+                                    ? 'bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-md'
                                     : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
                                     }`}
                             >
                                 {link.label}
                             </Link>
                         ))}
+
+                        {/* Theme Toggle Button - Desktop */}
+                        <button
+                            onClick={toggleTheme}
+                            className="ml-2 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                            aria-label="Toggle theme"
+                        >
+                            {theme === 'dark' ? (
+                                <Sun className="w-5 h-5 text-yellow-500" />
+                            ) : (
+                                <Moon className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+                            )}
+                        </button>
                     </div>
 
-                    {/* Right Side: Theme Toggle + Mobile Menu */}
-                    <div className="flex items-center gap-2">
-                        {/* Theme Toggle Button */}
+                    {/* Mobile: Theme Toggle + Menu Button */}
+                    <div className="md:hidden flex items-center gap-2">
+                        {/* Theme Toggle Button - Mobile */}
                         <button
                             onClick={toggleTheme}
                             className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
@@ -56,14 +69,14 @@ const Navbar = () => {
                             {theme === 'dark' ? (
                                 <Sun className="w-5 h-5 text-yellow-500" />
                             ) : (
-                                <Moon className="w-5 h-5 text-gray-700" />
+                                <Moon className="w-5 h-5 text-gray-700 dark:text-gray-300" />
                             )}
                         </button>
 
                         {/* Mobile Menu Button */}
                         <button
                             onClick={() => setIsOpen(!isOpen)}
-                            className="md:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+                            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                         >
                             {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
                         </button>

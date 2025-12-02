@@ -11,22 +11,22 @@ import TradesHistory from '../components/TradesHistory';
 
 const RLAgent = () => {
     return (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             {/* Page Header */}
-            <div className="mb-8">
-                <h1 className="text-4xl font-bold mb-2">RL Trading Agent</h1>
+            <div className="mb-10">
+                <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-primary-600 to-primary-800 bg-clip-text text-transparent">RL Trading Agent</h1>
                 <p className="text-gray-600 dark:text-gray-400 text-lg">
                     AI-powered trading recommendations using Proximal Policy Optimization (PPO)
                 </p>
             </div>
 
             {/* What You Get Section */}
-            <div className="mb-8 p-6 bg-gradient-to-r from-primary-50 to-accent-50 dark:from-primary-900/20 dark:to-accent-900/20 rounded-xl border border-primary-200 dark:border-primary-800">
+            <div className="mb-10 p-6 bg-gradient-to-r from-primary-50 to-accent-50 dark:from-primary-900/20 dark:to-accent-900/20 rounded-xl border border-primary-200 dark:border-primary-800 shadow-sm">
                 <h2 className="text-2xl font-bold mb-4 text-primary-900 dark:text-primary-100">
                     🎯 How This Helps You Make Better Trading Decisions
                 </h2>
                 <div className="grid md:grid-cols-3 gap-4 text-sm">
-                    <div className="bg-white dark:bg-gray-800 p-4 rounded-lg">
+                    <div className="bg-white dark:bg-gray-800 p-4 rounded-lg hover:shadow-lg transition-shadow duration-300">
                         <h3 className="font-semibold mb-2 text-green-700 dark:text-green-300">
                             ✓ Smart Entry & Exit Timing
                         </h3>
@@ -35,7 +35,7 @@ const RLAgent = () => {
                             not just which direction prices will move.
                         </p>
                     </div>
-                    <div className="bg-white dark:bg-gray-800 p-4 rounded-lg">
+                    <div className="bg-white dark:bg-gray-800 p-4 rounded-lg hover:shadow-lg transition-shadow duration-300">
                         <h3 className="font-semibold mb-2 text-blue-700 dark:text-blue-300">
                             ✓ Cost-Aware Trading
                         </h3>
@@ -44,7 +44,7 @@ const RLAgent = () => {
                             that would eat into your profits.
                         </p>
                     </div>
-                    <div className="bg-white dark:bg-gray-800 p-4 rounded-lg">
+                    <div className="bg-white dark:bg-gray-800 p-4 rounded-lg hover:shadow-lg transition-shadow duration-300">
                         <h3 className="font-semibold mb-2 text-purple-700 dark:text-purple-300">
                             ✓ Risk-Adjusted Returns
                         </h3>
@@ -87,7 +87,7 @@ const RLAgent = () => {
                 <HowItWorks />
 
                 {/* Info Footer */}
-                <div className="mt-8 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl border border-blue-200 dark:border-blue-800 shadow-sm">
                     <div className="flex items-start gap-3">
                         <span className="text-2xl">ℹ️</span>
                         <div>

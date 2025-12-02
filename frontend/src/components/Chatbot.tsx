@@ -70,13 +70,22 @@ const Chatbot = () => {
         <>
             {/* Floating Chat Button */}
             {!isOpen && (
-                <button
-                    onClick={() => setIsOpen(true)}
-                    className="fixed bottom-6 right-6 w-14 h-14 bg-primary-600 text-white rounded-full shadow-lg hover:bg-primary-700 transition-all hover:scale-110 flex items-center justify-center z-50"
-                    aria-label="Open chat"
-                >
-                    <MessageCircle className="w-6 h-6" />
-                </button>
+                <div className="fixed bottom-6 right-6 z-50">
+                    {/* Pulse Animation Ring */}
+                    <div className="absolute inset-0 w-14 h-14 bg-primary-600 rounded-full animate-ping opacity-75"></div>
+
+                    {/* Notification Badge */}
+                    <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full border-2 border-white dark:border-gray-900 animate-pulse z-10"></div>
+
+                    {/* Main Button */}
+                    <button
+                        onClick={() => setIsOpen(true)}
+                        className="relative w-14 h-14 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-full shadow-lg hover:shadow-xl hover:scale-110 transition-all duration-300 flex items-center justify-center group"
+                        aria-label="Open chat"
+                    >
+                        <MessageCircle className="w-6 h-6 group-hover:scale-110 transition-transform" />
+                    </button>
+                </div>
             )}
 
             {/* Chat Window */}

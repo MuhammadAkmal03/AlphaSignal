@@ -50,11 +50,11 @@ const Backtesting = () => {
     };
 
     return (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             {/* Header */}
-            <div className="mb-8">
-                <h1 className="text-4xl font-bold mb-2">Backtesting</h1>
-                <p className="text-gray-600 dark:text-gray-400">
+            <div className="mb-10">
+                <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-primary-600 to-primary-800 bg-clip-text text-transparent">Backtesting</h1>
+                <p className="text-gray-600 dark:text-gray-400 text-lg">
                     Test the model's historical performance with custom parameters
                 </p>
             </div>
@@ -311,8 +311,8 @@ const Backtesting = () => {
                                             <td className="py-3 px-4 text-sm">{trade.date}</td>
                                             <td className="py-3 px-4">
                                                 <span className={`px-2 py-1 rounded text-xs font-medium ${trade.action === 'BUY'
-                                                        ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'
-                                                        : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300'
+                                                    ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'
+                                                    : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300'
                                                     }`}>
                                                     {trade.action}
                                                 </span>
