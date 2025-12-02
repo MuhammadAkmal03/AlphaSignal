@@ -1,65 +1,43 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Oil drop shape with signal wave -->
   <defs>
-    <!-- Professional Gold Gradient -->
-    <linearGradient id="professionalGold" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#f4d03f;stop-opacity:1" />
-      <stop offset="50%" style="stop-color:#d4af37;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#b8941e;stop-opacity:1" />
-    </linearGradient>
-    
-    <!-- Blue Gradient for Signal -->
-    <linearGradient id="blueSignal" x1="0%" y1="0%" x2="100%" y2="0%">
+    <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" style="stop-color:#2563eb;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#1e40af;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#3b82f6;stop-opacity:1" />
     </linearGradient>
   </defs>
   
-  <!-- Circular Background -->
-  <circle cx="100" cy="100" r="85" fill="#1e3a8a" opacity="0.08"/>
+  <!-- Oil drop -->
+  <path d="M16 4C16 4 10 10 10 16C10 19.314 12.686 22 16 22C19.314 22 22 19.314 22 16C22 10 16 4 16 4Z" 
+        fill="url(#logoGradient)" 
+        class="logo-drop"/>
   
-  <!-- Oil Drop Shape - Clean and Symmetric -->
-  <path d="M 100 40 
-           C 88 48, 80 60, 80 80 
-           C 80 100, 88 115, 100 125 
-           C 112 115, 120 100, 120 80 
-           C 120 60, 112 48, 100 40 Z" 
-        fill="url(#professionalGold)" 
-        stroke="#b8941e" 
-        stroke-width="2"/>
+  <!-- Upward trending arrow/signal -->
+  <path d="M8 24L12 20L16 22L20 18L24 20" 
+        stroke="#f59e0b" 
+        stroke-width="2" 
+        stroke-linecap="round" 
+        stroke-linejoin="round"
+        class="logo-signal"/>
   
-  <!-- Letter "A" - Bold and Clear -->
-  <g transform="translate(100, 85)">
-    <!-- A shape -->
-    <path d="M 0 -20 L -12 10 L -7 10 L -5 3 L 5 3 L 7 10 L 12 10 Z" 
-          fill="white" 
-          stroke="white" 
-          stroke-width="1"/>
-    <!-- Horizontal bar of A -->
-    <rect x="-4" y="0" width="8" height="3" fill="white"/>
-  </g>
+  <!-- Arrow head -->
+  <path d="M24 20L22 18L24 16" 
+        stroke="#f59e0b" 
+        stroke-width="2" 
+        stroke-linecap="round" 
+        stroke-linejoin="round"
+        class="logo-signal"/>
   
-  <!-- Upward Trending Arrow - Clean Lines -->
-  <g transform="translate(130, 100)">
-    <!-- Arrow shaft -->
-    <line x1="0" y1="10" x2="25" y2="-15" 
-          stroke="url(#blueSignal)" 
-          stroke-width="4" 
-          stroke-linecap="round"/>
-    
-    <!-- Arrow head -->
-    <path d="M 25 -15 L 18 -10 L 22 -5 Z" 
-          fill="#2563eb"/>
-    
-    <!-- Data points on arrow -->
-    <circle cx="8" cy="2" r="2.5" fill="#3b82f6"/>
-    <circle cx="16" cy="-6" r="2.5" fill="#3b82f6"/>
-  </g>
-  
-  <!-- Subtle Signal Wave at Bottom -->
-  <path d="M 60 145 Q 75 140, 90 145 T 120 145 T 140 145" 
-        fill="none" 
-        stroke="url(#blueSignal)" 
-        stroke-width="2.5" 
-        stroke-linecap="round"
-        opacity="0.6"/>
+  <style>
+    /* Adaptive colors for dark mode */
+    @media (prefers-color-scheme: dark) {
+      .logo-drop {
+        fill: url(#logoGradient);
+        opacity: 0.9;
+      }
+      .logo-signal {
+        stroke: #fbbf24;
+      }
+    }
+  </style>
 </svg>

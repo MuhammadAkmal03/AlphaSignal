@@ -2,11 +2,12 @@
 // This is where everything comes together!
 
 import { useState, useEffect } from 'react';
-import { TrendingUp, TrendingDown, Newspaper, BarChart3, AlertCircle } from 'lucide-react';
+import { TrendingUp, TrendingDown, Newspaper, BarChart3, AlertCircle, Mail } from 'lucide-react';
 import Card from '../components/Card';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
 import NewsSummary from '../components/NewsSummary';
+import EmailReportModal from '../components/EmailReportModal';
 import { getPredictions, getNews, getMetrics } from '../api/client';
 import type { Prediction, NewsArticle, ModelMetrics } from '../types';
 
@@ -32,6 +33,9 @@ const Dashboard = () => {
     const [metrics, setMetrics] = useState<ModelMetrics | null>(null);
     const [metricsLoading, setMetricsLoading] = useState(true);
     const [metricsError, setMetricsError] = useState<string | null>(null);
+
+    // State for email modal
+    const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
 
     // ============================================
     // LESSON: React Hooks - useEffect
@@ -145,11 +149,20 @@ const Dashboard = () => {
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
             {/* Page Header */}
-            <div className="mb-8">
-                <h1 className="text-4xl font-bold mb-2">Dashboard</h1>
-                <p className="text-gray-600 dark:text-gray-400">
-                    Live predictions, news sentiment, and model performance
-                </p>
+            <div className="mb-8 flex items-center justify-between">
+                <div>
+                    <h1 className="text-4xl font-bold mb-2">Dashboard</h1>
+                    <p className="text-gray-600 dark:text-gray-400">
+                        Live predictions, news sentiment, and model performance
+                    </p>
+                </div>
+                <button
+                    onClick={() => setIsEmailModalOpen(true)}
+                    className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg font-semibold hover:bg-primary-700 transition-colors"
+                >
+                    <Mail className="w-5 h-5" />
+                    Get Email Report
+                </button>
             </div>
 
             {/* Grid Layout - Responsive */}
@@ -351,6 +364,12 @@ const Dashboard = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Email Report Modal */}
+            <EmailReportModal
+                isOpen={isEmailModalOpen}
+                onClose={() => setIsEmailModalOpen(false)}
+            />
         </div>
     );
 };

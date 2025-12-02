@@ -1,7 +1,13 @@
 import { Link } from 'react-router-dom';
-import { TrendingUp, BarChart3, Brain, Newspaper, ArrowRight, Github } from 'lucide-react';
+import { TrendingUp, BarChart3, Brain, Newspaper, ArrowRight, Github, Mail, CheckCircle } from 'lucide-react';
+import { useState } from 'react';
 
 const LandingPage = () => {
+    const [email, setEmail] = useState('');
+    const [subscribeLoading, setSubscribeLoading] = useState(false);
+    const [subscribeSuccess, setSubscribeSuccess] = useState(false);
+    const [subscribeError, setSubscribeError] = useState<string | null>(null);
+
     const features = [
         {
             icon: <TrendingUp className="w-8 h-8" />,
@@ -32,10 +38,39 @@ const LandingPage = () => {
         { label: 'Data Sources', value: '15+' },
     ];
 
-    const techStack = [
-        'Python', 'FastAPI', 'React', 'TypeScript', 'XGBoost',
-        'Stable-Baselines3', 'Tailwind CSS', 'Pandas', 'NumPy'
-    ];
+    const handleSubscribe = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        if (!email) {
+            setSubscribeError('Please enter your email address');
+            return;
+        }
+
+        setSubscribeLoading(true);
+        setSubscribeError(null);
+
+        try {
+            const response = await fetch('/api/email/subscribe', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.detail || 'Failed to subscribe');
+            }
+
+            setSubscribeSuccess(true);
+            setEmail('');
+            setTimeout(() => setSubscribeSuccess(false), 5000);
+        } catch (err: any) {
+            setSubscribeError(err.message || 'Failed to subscribe');
+        } finally {
+            setSubscribeLoading(false);
+        }
+    };
 
     return (
         <div className="min-h-screen">
@@ -107,26 +142,69 @@ const LandingPage = () => {
                 </div>
             </section>
 
-            {/* Tech Stack Section */}
-            <section className="py-20">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            {/* Email Subscription Section */}
+            <section className="py-20 bg-white dark:bg-gray-800">
+                <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-12">
-                        <h2 className="text-4xl font-bold mb-4">Technology Stack</h2>
+                        <Mail className="w-16 h-16 text-primary-600 mx-auto mb-4" />
+                        <h2 className="text-4xl font-bold mb-4">Stay Updated</h2>
                         <p className="text-xl text-gray-600 dark:text-gray-400">
-                            Built with modern, production-ready technologies
+                            Subscribe to receive daily crude oil price predictions and market insights directly to your inbox
                         </p>
                     </div>
 
-                    <div className="flex flex-wrap justify-center gap-4">
-                        {techStack.map((tech, index) => (
-                            <span
-                                key={index}
-                                className="px-6 py-3 bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300 rounded-full font-medium"
+                    <form onSubmit={handleSubscribe} className="max-w-2xl mx-auto">
+                        <div className="flex flex-col sm:flex-row gap-4">
+                            <input
+                                type="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                placeholder="Enter your email address"
+                                className="flex-1 px-6 py-4 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-lg"
+                                disabled={subscribeLoading || subscribeSuccess}
+                            />
+                            <button
+                                type="submit"
+                                disabled={subscribeLoading || subscribeSuccess}
+                                className="px-8 py-4 bg-primary-600 text-white rounded-lg font-semibold hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 whitespace-nowrap"
                             >
-                                {tech}
-                            </span>
-                        ))}
-                    </div>
+                                {subscribeLoading ? (
+                                    <>
+                                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                                        Subscribing...
+                                    </>
+                                ) : subscribeSuccess ? (
+                                    <>
+                                        <CheckCircle className="w-5 h-5" />
+                                        Subscribed!
+                                    </>
+                                ) : (
+                                    <>
+                                        <Mail className="w-5 h-5" />
+                                        Subscribe
+                                    </>
+                                )}
+                            </button>
+                        </div>
+
+                        {/* Success/Error Messages */}
+                        {subscribeSuccess && (
+                            <div className="mt-4 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg flex items-center gap-2 text-green-700 dark:text-green-300">
+                                <CheckCircle className="w-5 h-5" />
+                                <span className="font-medium">Successfully subscribed! Check your inbox daily at 8:00 AM.</span>
+                            </div>
+                        )}
+
+                        {subscribeError && (
+                            <div className="mt-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-700 dark:text-red-300">
+                                <span className="font-medium">{subscribeError}</span>
+                            </div>
+                        )}
+
+                        <p className="text-sm text-gray-500 dark:text-gray-400 text-center mt-4">
+                            📧 Daily reports at 8:00 AM • 🔒 Unsubscribe anytime • 🚫 No spam, ever
+                        </p>
+                    </form>
                 </div>
             </section>
 
