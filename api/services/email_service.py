@@ -20,6 +20,8 @@ EMAIL_USER = os.getenv('SENDER_EMAIL') or os.getenv('EMAIL_USER')
 EMAIL_PASSWORD = os.getenv('SENDER_PASSWORD') or os.getenv('EMAIL_PASSWORD')
 EMAIL_FROM = os.getenv('EMAIL_FROM', f'AlphaSignal <{EMAIL_USER}>')
 
+print(f"Email Config: Host={EMAIL_HOST}, Port={EMAIL_PORT}, User={EMAIL_USER}, Password={'*' * 5 if EMAIL_PASSWORD else 'None'}")
+
 
 def create_report_email_html(prediction_data: dict, metrics_data: dict = None) -> str:
     """
@@ -230,11 +232,11 @@ def send_email(to_email: str, subject: str, html_content: str) -> bool:
             server.login(EMAIL_USER, EMAIL_PASSWORD)
             server.send_message(message)
         
-        print(f"✅ Email sent successfully to {to_email}")
+        print(f" Email sent successfully to {to_email}")
         return True
         
     except Exception as e:
-        print(f"❌ Failed to send email to {to_email}: {str(e)}")
+        print(f"Failed to send email to {to_email}: {str(e)}")
         return False
 
 
@@ -291,6 +293,6 @@ if __name__ == "__main__":
     success = send_instant_report(test_email, test_prediction, test_metrics)
     
     if success:
-        print("✅ Test email sent successfully!")
+        print("Test email sent successfully!")
     else:
-        print("❌ Test email failed. Check your .env configuration.")
+        print("Test email failed. Check your .env configuration.")
