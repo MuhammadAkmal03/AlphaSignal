@@ -10,7 +10,7 @@ import joblib
 DATA = Path("data/final/train/train_dataset.csv")
 MODEL_OUT = Path("models/xgb_model.pkl")
 SCALER_OUT = Path("models/scaler.pkl")
-METRICS_OUT = Path("data/final/train/model_metrics.txt")
+METRICS_OUT = Path("data/final/prediction/performance_metrics.csv")
 
 def train_model():
     df = pd.read_csv(DATA)
@@ -58,9 +58,20 @@ def train_model():
     joblib.dump(model, MODEL_OUT)
     joblib.dump(scaler, SCALER_OUT)
 
+    # Save metrics to CSV for API to read
+    metrics_df = pd.DataFrame([{
+        'MAE': mae,
+        'MAPE': mape,
+        'RMSE': rmse,
+        'train_date': pd.Timestamp.now().isoformat()
+    }])
+    METRICS_OUT.parent.mkdir(parents=True, exist_ok=True)
+    metrics_df.to_csv(METRICS_OUT, index=False)
+
     print("\n MODEL TRAINED SUCCESSFULLY!")
-    print(f"Model saved → {MODEL_OUT}")
-    print(f"Scaler saved → {SCALER_OUT}")
+    print(f"Model saved -> {MODEL_OUT}")
+    print(f"Scaler saved -> {SCALER_OUT}")
+    print(f"Metrics saved -> {METRICS_OUT}")
     print(" Evaluation:")
     print(f"   MAE  = {mae:.3f}")
     print(f"   RMSE = {rmse:.3f}")

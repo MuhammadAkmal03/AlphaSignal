@@ -44,12 +44,13 @@ def upload_file_to_gcs(local_path: str, gcs_path: str) -> bool:
         return False
 
 def upload_prediction_data():
-    """Upload prediction log and latest prediction to GCS"""
+    """Upload prediction log, latest prediction, and metrics to GCS"""
     base = Path(__file__).resolve().parents[2]
     
     files = [
         (base / "data/final/prediction/prediction_log.csv", "data/prediction/prediction_log.csv"),
         (base / "data/final/prediction/latest_prediction.txt", "data/prediction/latest_prediction.txt"),
+        (base / "data/final/prediction/performance_metrics.csv", "data/prediction/performance_metrics.csv"),
     ]
     
     for local, gcs in files:

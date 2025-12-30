@@ -30,13 +30,19 @@ def download_file_from_gcs(gcs_path: str, local_path: Path) -> bool:
         return False
 
 def read_csv_from_gcs(gcs_path: str) -> Optional[pd.DataFrame]:
-    """Read CSV file from GCS"""
+    """Read CSV file from GCS with time-based cache refresh"""
+    import time
     local_path = LOCAL_CACHE / gcs_path.replace("/", "_")
     
-    # Download if not cached
-    if not local_path.exists():
-        if not download_file_from_gcs(gcs_path, local_path):
-            return None
+    # Re-download if file doesn't exist OR is older than 1 hour
+    should_download = True
+    if local_path.exists():
+        file_age = time.time() - local_path.stat().st_mtime
+        if file_age < 3600:  # 1 hour cache
+            should_download = False
+    
+    if should_download:
+        download_file_from_gcs(gcs_path, local_path)
     
     try:
         df = pd.read_csv(local_path)
@@ -63,13 +69,19 @@ def read_pickle_from_gcs(gcs_path: str) -> Optional[any]:
         return None
 
 def read_text_from_gcs(gcs_path: str) -> Optional[str]:
-    """Read text file from GCS"""
+    """Read text file from GCS with time-based cache refresh"""
+    import time
     local_path = LOCAL_CACHE / gcs_path.replace("/", "_")
     
-    # Download if not cached
-    if not local_path.exists():
-        if not download_file_from_gcs(gcs_path, local_path):
-            return None
+    # Re-download if file doesn't exist OR is older than 1 hour
+    should_download = True
+    if local_path.exists():
+        file_age = time.time() - local_path.stat().st_mtime
+        if file_age < 3600:  # 1 hour cache
+            should_download = False
+    
+    if should_download:
+        download_file_from_gcs(gcs_path, local_path)
     
     try:
         with open(local_path, "r") as f:
