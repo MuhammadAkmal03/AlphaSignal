@@ -51,9 +51,11 @@ async def get_latest_news(limit: Optional[int] = 5):
         
         articles = []
         for _, row in df.iterrows():
+            # The CSV has 'sentiment_label' column, not 'sentiment'
+            sentiment = row.get('sentiment_label', row.get('sentiment', 'neutral'))
             articles.append(NewsArticle(
                 title=row.get('title', 'No title'),
-                sentiment=row.get('sentiment', 'neutral'),
+                sentiment=sentiment.lower() if isinstance(sentiment, str) else 'neutral',
                 score=float(row.get('sentiment_score', 0.0)),
                 published_at=row['date'].isoformat()
             ))

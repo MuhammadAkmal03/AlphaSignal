@@ -89,10 +89,11 @@ const Analytics = () => {
         }
     };
 
+    // Chart data - shows predictions over time
+    // Note: We only have predicted prices from the model
     const chartData = predictions.map((pred) => ({
         date: new Date(pred.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
         predicted: pred.predicted_price,
-        actual: pred.predicted_price * (0.95 + Math.random() * 0.1),
     }));
 
     const stats = {
@@ -108,9 +109,10 @@ const Analytics = () => {
             : 0,
     };
 
-    const errorDistribution = chartData.map(d => ({
+    // Calculate daily price changes for volatility visualization
+    const priceChanges = chartData.slice(1).map((d, i) => ({
         date: d.date,
-        error: Math.abs(d.predicted - d.actual),
+        change: chartData.length > i ? d.predicted - chartData[i].predicted : 0,
     }));
 
     return (
@@ -184,7 +186,7 @@ const Analytics = () => {
                         </Card>
                     </div>
 
-                    <Card title="Predicted vs Actual Prices" className="hover:shadow-xl transition-shadow duration-300">
+                    <Card title="Predicted Brent Oil Prices" className="hover:shadow-xl transition-shadow duration-300">
                         <ResponsiveContainer width="100%" height={400}>
                             <LineChart data={chartData}>
                                 <CartesianGrid strokeDasharray="3 3" stroke="#374151" opacity={0.1} />
@@ -192,20 +194,19 @@ const Analytics = () => {
                                 <YAxis stroke="#6b7280" style={{ fontSize: '12px' }} domain={['auto', 'auto']} />
                                 <Tooltip contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '8px', color: '#fff' }} />
                                 <Legend />
-                                <Line type="monotone" dataKey="predicted" stroke="#2563eb" strokeWidth={2} dot={{ fill: '#2563eb', r: 4 }} name="Predicted Price" />
-                                <Line type="monotone" dataKey="actual" stroke="#10b981" strokeWidth={2} dot={{ fill: '#10b981', r: 4 }} name="Actual Price" />
+                                <Line type="monotone" dataKey="predicted" stroke="#2563eb" strokeWidth={2} dot={{ fill: '#2563eb', r: 3 }} name="Predicted Price ($)" />
                             </LineChart>
                         </ResponsiveContainer>
                     </Card>
 
-                    <Card title="Prediction Error Over Time" className="hover:shadow-xl transition-shadow duration-300">
+                    <Card title="Daily Price Change" className="hover:shadow-xl transition-shadow duration-300">
                         <ResponsiveContainer width="100%" height={300}>
-                            <BarChart data={errorDistribution}>
+                            <BarChart data={priceChanges}>
                                 <CartesianGrid strokeDasharray="3 3" stroke="#374151" opacity={0.1} />
                                 <XAxis dataKey="date" stroke="#6b7280" style={{ fontSize: '12px' }} />
                                 <YAxis stroke="#6b7280" style={{ fontSize: '12px' }} />
                                 <Tooltip contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '8px', color: '#fff' }} />
-                                <Bar dataKey="error" fill="#f59e0b" name="Absolute Error ($)" />
+                                <Bar dataKey="change" fill="#10b981" name="Price Change ($)" />
                             </BarChart>
                         </ResponsiveContainer>
                     </Card>
@@ -253,7 +254,7 @@ const Analytics = () => {
                             <AlertCircle className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 mr-3 flex-shrink-0" />
                             <div>
                                 <p className="text-sm text-blue-800 dark:text-blue-200">
-                                    <strong>Note:</strong> Actual prices shown are simulated. In production, these would come from your actuals log.
+                                    <strong>Note:</strong> Predictions are generated daily by our XGBoost model trained on market data, AIS shipping patterns, and news sentiment.
                                 </p>
                             </div>
                         </div>

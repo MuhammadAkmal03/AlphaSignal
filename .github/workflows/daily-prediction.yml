@@ -1,0 +1,73 @@
+name: Daily Prediction Pipeline
+
+on:
+  schedule:
+    # Run daily at 00:30 UTC (6:00 AM IST)
+    - cron: '30 0 * * *'
+  workflow_dispatch:  # Allow manual trigger
+
+env:
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+
+jobs:
+  daily-pipeline:
+    name: Run Daily Pipeline
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Cache pip dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+
+      - name: Create required directories
+        run: |
+          mkdir -p data/raw/nlp
+          mkdir -p data/final/prediction
+          mkdir -p data/final/train
+          mkdir -p data/cache
+          mkdir -p models
+
+      - name: Download existing model from GCS
+        run: |
+          gsutil -m cp -r gs://alphasignal-models/models/* models/ || echo "No existing models found"
+
+      - name: Run Daily Pipeline
+        env:
+          NEWSAPI_KEY: ${{ secrets.NEWSAPI_KEY }}
+          EIA_API_KEY: ${{ secrets.EIA_API_KEY }}
+        run: |
+          python src/orchestrator/daily_pipeline.py
+
+      - name: Upload models to GCS
+        run: |
+          gsutil -m cp -r models/* gs://alphasignal-models/models/
+
+      - name: Pipeline Summary
+        run: |
+          echo "✅ Daily pipeline completed successfully!"
+          echo "📅 Date: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
