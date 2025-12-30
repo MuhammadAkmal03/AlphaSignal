@@ -36,7 +36,7 @@ const EquityCurveChart = () => {
 
     if (loading) return <Card><LoadingSpinner /></Card>;
     if (error) return <Card><ErrorMessage message={error} /></Card>;
-    if (!data || !data.data.length) return <Card><p className="text-gray-500">No equity data available</p></Card>;
+    if (!data || !data.data?.length) return <Card><p className="text-gray-500">No equity data available</p></Card>;
 
     return (
         <Card>
@@ -64,21 +64,21 @@ const EquityCurveChart = () => {
                 <div className="grid grid-cols-3 gap-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                     <div>
                         <p className="text-sm text-gray-600 dark:text-gray-400">Initial</p>
-                        <p className="text-lg font-bold">${data.summary.initial_equity.toFixed(2)}</p>
+                        <p className="text-lg font-bold">${data.summary?.initial_equity?.toFixed(2) || '0.00'}</p>
                     </div>
                     <div>
                         <p className="text-sm text-gray-600 dark:text-gray-400">Final</p>
-                        <p className={`text-lg font-bold ${data.summary.final_equity >= data.summary.initial_equity
-                                ? 'text-green-600'
-                                : 'text-red-600'
+                        <p className={`text-lg font-bold ${(data.summary?.final_equity || 0) >= (data.summary?.initial_equity || 0)
+                            ? 'text-green-600'
+                            : 'text-red-600'
                             }`}>
-                            ${data.summary.final_equity.toFixed(2)}
+                            ${data.summary?.final_equity?.toFixed(2) || '0.00'}
                         </p>
                     </div>
                     <div>
                         <p className="text-sm text-gray-600 dark:text-gray-400">Peak</p>
                         <p className="text-lg font-bold text-blue-600">
-                            ${data.summary.peak_equity.toFixed(2)}
+                            ${data.summary?.peak_equity?.toFixed(2) || '0.00'}
                         </p>
                     </div>
                 </div>

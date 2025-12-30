@@ -1,34 +1,37 @@
 // AI News Summary Component
 // Displays AI-generated summary of today's oil news
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Sparkles, RefreshCw, TrendingUp, Calendar } from 'lucide-react';
 import Card from './Card';
-import axios from 'axios';
+import { getNews } from '../api/client';
 
 interface NewsSummaryData {
     summary: string;
     article_count: number;
-    sentiment_overview: string;
-    key_topics: string[];
+    overall_sentiment: string;
     generated_at: string;
 }
 
 const NewsSummary = () => {
     const [summary, setSummary] = useState<NewsSummaryData | null>(null);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        fetchSummary();
+    }, []);
 
     const fetchSummary = async () => {
         setLoading(true);
         setError(null);
 
         try {
-            const response = await axios.post('/api/ai-news/ai-summary');
+            const response = await getNews.summary();
             setSummary(response.data);
         } catch (err) {
             console.error('Failed to fetch news summary:', err);
-            setError('Failed to generate news summary');
+            setError('Failed to load news summary');
         } finally {
             setLoading(false);
         }
@@ -55,10 +58,10 @@ const NewsSummary = () => {
                     <button
                         onClick={fetchSummary}
                         disabled={loading}
-                        className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
-                        title="Generate Summary"
+                        className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50"
                     >
-                        <RefreshCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
+                        <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+                        {loading ? 'Generating...' : summary ? 'Refresh' : 'Generate Summary'}
                     </button>
                 </div>
 
@@ -110,8 +113,8 @@ const NewsSummary = () => {
                             {/* Sentiment */}
                             <div className="flex items-center gap-2 text-sm">
                                 <TrendingUp className="w-4 h-4 text-gray-500" />
-                                <span className={`px-2 py-1 rounded-full text-xs font-medium ${getSentimentColor(summary.sentiment_overview)}`}>
-                                    {summary.sentiment_overview}
+                                <span className={`px-2 py-1 rounded-full text-xs font-medium ${getSentimentColor(summary.overall_sentiment)}`}>
+                                    {summary.overall_sentiment}
                                 </span>
                             </div>
 
@@ -120,23 +123,6 @@ const NewsSummary = () => {
                                 {new Date(summary.generated_at).toLocaleTimeString()}
                             </div>
                         </div>
-
-                        {/* Key Topics */}
-                        {summary.key_topics.length > 0 && (
-                            <div>
-                                <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Key Topics:</p>
-                                <div className="flex flex-wrap gap-2">
-                                    {summary.key_topics.map((topic, index) => (
-                                        <span
-                                            key={index}
-                                            className="px-3 py-1 bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 rounded-full text-sm"
-                                        >
-                                            {topic}
-                                        </span>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
                     </div>
                 )}
             </div>

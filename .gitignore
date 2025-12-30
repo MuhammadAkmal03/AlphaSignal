@@ -17,6 +17,12 @@ ENV/
 .env.local
 .env.*.local
 
+# Secrets & Credentials
+key.json
+*.pem
+*credentials*.json
+*service-account*.json
+
 # Data & Models (large files)
 /data/raw 
 data/

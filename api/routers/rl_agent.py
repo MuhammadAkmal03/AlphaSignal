@@ -6,13 +6,13 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from pathlib import Path
 import pandas as pd
-import sys
-
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+from services.gcs_data_loader import read_csv_from_gcs
 
 router = APIRouter()
 
-RL_EVAL_DIR = Path("data/final/rl_eval_momentum")
+RL_TRADES_LOG_GCS = "data/rl/trades_log.csv"
+RL_EVAL_SUMMARY_GCS = "data/rl/evaluation_summary.csv"
+RL_BACKTEST_GCS = "data/rl/backtest_full.csv"
 
 
 class RLRecommendation(BaseModel):
@@ -34,17 +34,13 @@ async def get_rl_recommendation():
     """Get current RL agent recommendation"""
     try:
         # Load latest evaluation results
-        trades_log = RL_EVAL_DIR / "trades_log.csv"
+        df = read_csv_from_gcs(RL_TRADES_LOG_GCS)
         
-        if not trades_log.exists():
+        if df is None or df.empty:
             raise HTTPException(
                 status_code=404, 
                 detail="RL evaluation not found. Run evaluation first."
             )
-        
-        df = pd.read_csv(trades_log)
-        if df.empty:
-            raise HTTPException(status_code=404, detail="No RL data available")
         
         # Get latest action
         latest = df.iloc[-1]
@@ -81,17 +77,13 @@ async def get_rl_recommendation():
 async def get_rl_performance():
     """Get RL agent performance metrics"""
     try:
-        summary_file = RL_EVAL_DIR / "evaluation_summary.csv"
+        df = read_csv_from_gcs(RL_EVAL_SUMMARY_GCS)
         
-        if not summary_file.exists():
+        if df is None or df.empty:
             raise HTTPException(
                 status_code=404,
                 detail="Performance data not found. Run evaluation first."
             )
-        
-        df = pd.read_csv(summary_file)
-        if df.empty:
-            raise HTTPException(status_code=404, detail="No performance data available")
         
         metrics = df.iloc[0]
         
@@ -111,12 +103,10 @@ async def get_rl_performance():
 async def get_equity_curve():
     """Get RL agent equity curve data"""
     try:
-        backtest_file = RL_EVAL_DIR / "backtest_full.csv"
+        df = read_csv_from_gcs(RL_BACKTEST_GCS)
         
-        if not backtest_file.exists():
+        if df is None or df.empty:
             raise HTTPException(status_code=404, detail="Equity curve data not found")
-        
-        df = pd.read_csv(backtest_file)
         
         # Return simplified data for charting
         return {

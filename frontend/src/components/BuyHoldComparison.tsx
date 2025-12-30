@@ -46,22 +46,22 @@ const BuyHoldComparison = () => {
     const comparisonData = [
         {
             metric: 'Total Return',
-            'RL Agent': (performance.net_total_return * 100).toFixed(1),
+            'RL Agent': ((performance.net_total_return || 0) * 100).toFixed(1),
             'Buy & Hold': (buyHoldReturn * 100).toFixed(1),
         },
         {
             metric: 'Sharpe Ratio',
-            'RL Agent': performance.sharpe_ratio.toFixed(2),
+            'RL Agent': (performance.sharpe_ratio || 0).toFixed(2),
             'Buy & Hold': buyHoldSharpe.toFixed(2),
         },
         {
             metric: 'Max Drawdown',
-            'RL Agent': (performance.max_drawdown * 100).toFixed(1),
+            'RL Agent': ((performance.max_drawdown || 0) * 100).toFixed(1),
             'Buy & Hold': (buyHoldDrawdown * 100).toFixed(1),
         },
     ];
 
-    const outperformance = ((performance.net_total_return - buyHoldReturn) * 100).toFixed(1);
+    const outperformance = (((performance.net_total_return || 0) - buyHoldReturn) * 100).toFixed(1);
 
     return (
         <Card>
@@ -126,7 +126,7 @@ const BuyHoldComparison = () => {
                             ✓ Higher Returns
                         </h4>
                         <p className="text-sm text-blue-700 dark:text-blue-300">
-                            The RL agent achieved {(performance.net_total_return * 100).toFixed(1)}% return vs
+                            The RL agent achieved {((performance.net_total_return || 0) * 100).toFixed(1)}% return vs
                             {' '}{(buyHoldReturn * 100).toFixed(1)}% for buy & hold
                         </p>
                     </div>
@@ -135,7 +135,7 @@ const BuyHoldComparison = () => {
                             ✓ Better Risk-Adjusted
                         </h4>
                         <p className="text-sm text-blue-700 dark:text-blue-300">
-                            Sharpe ratio of {performance.sharpe_ratio.toFixed(2)} shows superior
+                            Sharpe ratio of {(performance.sharpe_ratio || 0).toFixed(2)} shows superior
                             risk-adjusted performance
                         </p>
                     </div>
@@ -144,7 +144,7 @@ const BuyHoldComparison = () => {
                             ✓ Lower Drawdown
                         </h4>
                         <p className="text-sm text-blue-700 dark:text-blue-300">
-                            Max drawdown of {(performance.max_drawdown * 100).toFixed(1)}% vs
+                            Max drawdown of {((performance.max_drawdown || 0) * 100).toFixed(1)}% vs
                             {' '}{(buyHoldDrawdown * 100).toFixed(1)}% means less risk
                         </p>
                     </div>

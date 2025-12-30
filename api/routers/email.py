@@ -12,7 +12,7 @@ import sys
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from api.services.email_service import send_instant_report, send_daily_report
+from api.services.sendgrid_email_service import send_instant_report, send_daily_report
 
 router = APIRouter()
 
@@ -57,14 +57,11 @@ async def send_report_now(request: EmailRequest):
     Stores email in database for record keeping
     """
     try:
-        # Load latest prediction
-        from api.routers.predictions import PREDICTION_LOG
+        # Load latest prediction from GCS
+        from services.gcs_data_loader import read_csv_from_gcs
         
-        if not PREDICTION_LOG.exists():
-            raise HTTPException(status_code=404, detail="No predictions available")
-        
-        df = pd.read_csv(PREDICTION_LOG)
-        if df.empty:
+        df = read_csv_from_gcs("data/prediction/prediction_log.csv")
+        if df is None or df.empty:
             raise HTTPException(status_code=404, detail="No predictions available")
         
         latest = df.iloc[-1]
@@ -86,7 +83,7 @@ async def send_report_now(request: EmailRequest):
         except:
             pass
         
-        # Send email
+        # Send email via SendGrid
         success = send_instant_report(request.email, prediction_data, metrics_data)
         
         if not success:

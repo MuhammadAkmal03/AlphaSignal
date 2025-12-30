@@ -8,11 +8,12 @@ from typing import Optional
 from pathlib import Path
 import pandas as pd
 import json
+from services.gcs_data_loader import read_csv_from_gcs, read_text_from_gcs
 
 router = APIRouter()
 
-NEWS_DATA = Path("data/processed/realtime_news_sentiment.csv")
-NEWS_SUMMARY = Path("data/processed/news_summary.json")
+NEWS_DATA_GCS = "data/news/realtime_news_sentiment.csv"
+NEWS_SUMMARY_GCS = "data/news/news_summary.json"
 
 
 class NewsArticle(BaseModel):
@@ -33,10 +34,16 @@ class NewsSummary(BaseModel):
 async def get_latest_news(limit: Optional[int] = 5):
     """Get latest news articles with sentiment"""
     try:
-        if not NEWS_DATA.exists():
-            raise HTTPException(status_code=404, detail="News data not found")
+        print(f"Loading news from GCS: {NEWS_DATA_GCS}")
+        df = read_csv_from_gcs(NEWS_DATA_GCS)
+        print(f"News data loaded: {df is not None}, Empty: {df.empty if df is not None else 'N/A'}")
         
-        df = pd.read_csv(NEWS_DATA)
+        if df is None or df.empty:
+            raise HTTPException(status_code=404, detail="News data not found or empty")
+        
+        print(f"News columns: {df.columns.tolist()}")
+        print(f"News shape: {df.shape}")
+        
         df['date'] = pd.to_datetime(df['date'])
         
         # Get most recent articles
@@ -51,9 +58,16 @@ async def get_latest_news(limit: Optional[int] = 5):
                 published_at=row['date'].isoformat()
             ))
         
+        print(f"Returning {len(articles)} articles")
         return {"articles": articles, "count": len(articles)}
     
+    except HTTPException:
+        raise
     except Exception as e:
+        import traceback
+        error_details = traceback.format_exc()
+        print(f"Error loading news: {str(e)}")
+        print(f"Traceback: {error_details}")
         raise HTTPException(status_code=500, detail=f"Error loading news: {str(e)}")
 
 
@@ -61,11 +75,11 @@ async def get_latest_news(limit: Optional[int] = 5):
 async def get_news_summary():
     """Get AI-generated news summary"""
     try:
-        if not NEWS_SUMMARY.exists():
+        content = read_text_from_gcs(NEWS_SUMMARY_GCS)
+        if content is None:
             raise HTTPException(status_code=404, detail="News summary not found")
         
-        with open(NEWS_SUMMARY, 'r', encoding='utf-8') as f:
-            data = json.load(f)
+        data = json.loads(content)
         
         return NewsSummary(
             summary=data.get('summary', 'No summary available'),
@@ -82,10 +96,9 @@ async def get_news_summary():
 async def get_sentiment_stats():
     """Get aggregated sentiment statistics"""
     try:
-        if not NEWS_DATA.exists():
+        df = read_csv_from_gcs(NEWS_DATA_GCS)
+        if df is None or df.empty:
             raise HTTPException(status_code=404, detail="News data not found")
-        
-        df = pd.read_csv(NEWS_DATA)
         
         # Calculate sentiment distribution
         sentiment_counts = df['sentiment'].value_counts().to_dict()

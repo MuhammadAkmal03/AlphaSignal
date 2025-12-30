@@ -13,7 +13,7 @@ RUN npm ci
 COPY . .
 
 # Build argument for API URL
-ARG VITE_API_URL
+ARG VITE_API_URL=https://alphasignal-backend-1079466778366.asia-south1.run.app/api
 ENV VITE_API_URL=$VITE_API_URL
 
 # Build the application

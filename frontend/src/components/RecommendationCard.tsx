@@ -99,7 +99,7 @@ const RecommendationCard = () => {
                                 Confidence
                             </span>
                             <span className={`text-lg font-bold ${style.text}`}>
-                                {recommendation.confidence.toFixed(1)}%
+                                {recommendation.confidence?.toFixed(1) || '0.0'}%
                             </span>
                         </div>
                         <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
@@ -110,7 +110,7 @@ const RecommendationCard = () => {
                                         ? 'bg-red-500'
                                         : 'bg-blue-500'
                                     }`}
-                                style={{ width: `${recommendation.confidence}%` }}
+                                style={{ width: `${recommendation.confidence || 0}%` }}
                             />
                         </div>
                     </div>

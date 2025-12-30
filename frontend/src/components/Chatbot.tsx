@@ -3,7 +3,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { MessageCircle, X, Send, Loader2 } from 'lucide-react';
-import axios from 'axios';
+import api from '../api/client';
 
 interface Message {
     role: 'user' | 'assistant';
@@ -36,7 +36,7 @@ const Chatbot = () => {
         setLoading(true);
 
         try {
-            const response = await axios.post('/api/chatbot/chat', {
+            const response = await api.post('/chatbot/chat', {
                 message: input,
                 history: messages
             });

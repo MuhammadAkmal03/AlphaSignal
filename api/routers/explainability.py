@@ -10,13 +10,14 @@ import pandas as pd
 import numpy as np
 import pickle
 import json
+from services.gcs_data_loader import read_csv_from_gcs, read_text_from_gcs
 
 router = APIRouter()
 
-MODEL_PATH = Path("models/xgb_model.pkl")
-FEATURE_NAMES_PATH = Path("models/feature_names.json")
-SHAP_VALUES_PATH = Path("data/final/shap/shap_values.csv")
-SHAP_SUMMARY_PATH = Path("data/final/shap/feature_importance.csv")
+MODEL_PATH_GCS = "models/xgb_model.pkl"
+FEATURE_NAMES_GCS = "models/feature_names.json"
+SHAP_VALUES_GCS = "data/shap/shap_values.csv"
+SHAP_SUMMARY_GCS = "data/shap/feature_importance.csv"
 
 
 class FeatureImportance(BaseModel):
@@ -46,8 +47,8 @@ async def get_shap_summary():
     """
     try:
         # Try to load pre-computed SHAP summary
-        if SHAP_SUMMARY_PATH.exists():
-            df = pd.read_csv(SHAP_SUMMARY_PATH)
+        df = read_csv_from_gcs(SHAP_SUMMARY_GCS)
+        if df is not None and not df.empty:
             
             importance_list = []
             for idx, row in df.iterrows():

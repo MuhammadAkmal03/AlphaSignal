@@ -6,11 +6,12 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from pathlib import Path
 import pandas as pd
+from services.gcs_data_loader import read_csv_from_gcs
 
 router = APIRouter()
 
-PERFORMANCE_METRICS = Path("data/final/prediction/performance_metrics.csv")
-PREDICTION_LOG = Path("data/final/prediction/prediction_log.csv")
+PERFORMANCE_METRICS_GCS = "data/prediction/performance_metrics.csv"
+PREDICTION_LOG_GCS = "data/prediction/prediction_log.csv"
 
 
 class ModelMetrics(BaseModel):
@@ -30,19 +31,16 @@ class SystemHealth(BaseModel):
 async def get_model_metrics():
     """Get model performance metrics"""
     try:
-        if not PERFORMANCE_METRICS.exists():
-            raise HTTPException(status_code=404, detail="Performance metrics not found")
-        
-        df = pd.read_csv(PERFORMANCE_METRICS)
-        if df.empty:
+        df = read_csv_from_gcs(PERFORMANCE_METRICS_GCS)
+        if df is None or df.empty:
             raise HTTPException(status_code=404, detail="No metrics available")
         
         metrics = df.iloc[-1]
         
         # Get total predictions count (unique dates only)
         pred_count = 0
-        if PREDICTION_LOG.exists():
-            pred_df = pd.read_csv(PREDICTION_LOG)
+        pred_df = read_csv_from_gcs(PREDICTION_LOG_GCS)
+        if pred_df is not None and not pred_df.empty:
             # Count unique dates instead of total rows
             pred_df['date'] = pd.to_datetime(pred_df['date'], errors='coerce').dt.normalize()
             pred_count = pred_df['date'].nunique()  # nunique() = number of unique values

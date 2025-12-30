@@ -39,29 +39,29 @@ const PerformanceMetrics = () => {
     const metrics = [
         {
             label: 'Net Total Return',
-            value: `${(performance.net_total_return * 100).toFixed(2)}%`,
+            value: `${((performance.net_total_return || 0) * 100).toFixed(2)}%`,
             icon: TrendingUp,
-            color: performance.net_total_return >= 0 ? 'text-green-600' : 'text-red-600',
-            bgColor: performance.net_total_return >= 0 ? 'bg-green-100 dark:bg-green-900/30' : 'bg-red-100 dark:bg-red-900/30',
+            color: (performance.net_total_return || 0) >= 0 ? 'text-green-600' : 'text-red-600',
+            bgColor: (performance.net_total_return || 0) >= 0 ? 'bg-green-100 dark:bg-green-900/30' : 'bg-red-100 dark:bg-red-900/30',
         },
         {
             label: 'Gross Total Return',
-            value: `${(performance.gross_total_return * 100).toFixed(2)}%`,
+            value: `${((performance.gross_total_return || 0) * 100).toFixed(2)}%`,
             icon: DollarSign,
             color: 'text-blue-600',
             bgColor: 'bg-blue-100 dark:bg-blue-900/30',
         },
         {
             label: 'Sharpe Ratio',
-            value: performance.sharpe_ratio.toFixed(3),
+            value: (performance.sharpe_ratio || 0).toFixed(3),
             icon: Activity,
-            color: performance.sharpe_ratio >= 1 ? 'text-green-600' : 'text-yellow-600',
-            bgColor: performance.sharpe_ratio >= 1 ? 'bg-green-100 dark:bg-green-900/30' : 'bg-yellow-100 dark:bg-yellow-900/30',
+            color: (performance.sharpe_ratio || 0) >= 1 ? 'text-green-600' : 'text-yellow-600',
+            bgColor: (performance.sharpe_ratio || 0) >= 1 ? 'bg-green-100 dark:bg-green-900/30' : 'bg-yellow-100 dark:bg-yellow-900/30',
             tooltip: 'Risk-adjusted return (higher is better)',
         },
         {
             label: 'Max Drawdown',
-            value: `${(performance.max_drawdown * 100).toFixed(2)}%`,
+            value: `${((performance.max_drawdown || 0) * 100).toFixed(2)}%`,
             icon: AlertTriangle,
             color: 'text-red-600',
             bgColor: 'bg-red-100 dark:bg-red-900/30',
@@ -69,7 +69,7 @@ const PerformanceMetrics = () => {
         },
         {
             label: 'Total Costs',
-            value: `${(performance.total_costs * 100).toFixed(2)}%`,
+            value: `${((performance.total_costs || 0) * 100).toFixed(2)}%`,
             icon: Coins,
             color: 'text-gray-600',
             bgColor: 'bg-gray-100 dark:bg-gray-800',
@@ -77,10 +77,10 @@ const PerformanceMetrics = () => {
         },
         {
             label: 'Net Profit',
-            value: `${((performance.gross_total_return - performance.total_costs) * 100).toFixed(2)}%`,
+            value: `${(((performance.gross_total_return || 0) - (performance.total_costs || 0)) * 100).toFixed(2)}%`,
             icon: Target,
-            color: (performance.gross_total_return - performance.total_costs) >= 0 ? 'text-green-600' : 'text-red-600',
-            bgColor: (performance.gross_total_return - performance.total_costs) >= 0 ? 'bg-green-100 dark:bg-green-900/30' : 'bg-red-100 dark:bg-red-900/30',
+            color: ((performance.gross_total_return || 0) - (performance.total_costs || 0)) >= 0 ? 'text-green-600' : 'text-red-600',
+            bgColor: ((performance.gross_total_return || 0) - (performance.total_costs || 0)) >= 0 ? 'bg-green-100 dark:bg-green-900/30' : 'bg-red-100 dark:bg-red-900/30',
         },
     ];
 

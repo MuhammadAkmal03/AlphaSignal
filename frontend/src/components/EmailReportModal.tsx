@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { X, Mail, Send, Bell, CheckCircle, AlertCircle } from 'lucide-react';
+import api from '../api/client';
 
 interface EmailReportModalProps {
     isOpen: boolean;
@@ -24,18 +25,7 @@ const EmailReportModal = ({ isOpen, onClose }: EmailReportModalProps) => {
         setSuccess(false);
 
         try {
-            const response = await fetch('/api/email/send-report', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email }),
-            });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.detail || 'Failed to send report');
-            }
-
+            const response = await api.post('/email/send-report', { email });
             setSuccess(true);
             setTimeout(() => {
                 setEmail('');
@@ -60,18 +50,7 @@ const EmailReportModal = ({ isOpen, onClose }: EmailReportModalProps) => {
         setSuccess(false);
 
         try {
-            const response = await fetch('/api/email/subscribe', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email }),
-            });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.detail || 'Failed to subscribe');
-            }
-
+            const response = await api.post('/email/subscribe', { email });
             setSuccess(true);
             setTimeout(() => {
                 setEmail('');
@@ -112,8 +91,8 @@ const EmailReportModal = ({ isOpen, onClose }: EmailReportModalProps) => {
                             setSuccess(false);
                         }}
                         className={`flex-1 py-3 px-4 font-medium transition-colors ${activeTab === 'instant'
-                                ? 'border-b-2 border-primary-600 text-primary-600'
-                                : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                            ? 'border-b-2 border-primary-600 text-primary-600'
+                            : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
                             }`}
                     >
                         <Mail className="w-4 h-4 inline mr-2" />
@@ -126,8 +105,8 @@ const EmailReportModal = ({ isOpen, onClose }: EmailReportModalProps) => {
                             setSuccess(false);
                         }}
                         className={`flex-1 py-3 px-4 font-medium transition-colors ${activeTab === 'subscribe'
-                                ? 'border-b-2 border-primary-600 text-primary-600'
-                                : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                            ? 'border-b-2 border-primary-600 text-primary-600'
+                            : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
                             }`}
                     >
                         <Bell className="w-4 h-4 inline mr-2" />

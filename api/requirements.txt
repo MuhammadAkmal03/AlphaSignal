@@ -9,5 +9,8 @@ numpy==1.24.3
 groq
 python-dotenv
 
+# Google Cloud Storage
+google-cloud-storage==2.10.0
+
 # Optional: for production deployment
 gunicorn==21.2.0

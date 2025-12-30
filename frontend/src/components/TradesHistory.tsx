@@ -69,12 +69,12 @@ const TradesHistory = () => {
     const exportToCSV = () => {
         const headers = ['Step', 'Action', 'Position', 'Price', 'Return (%)', 'Cumulative Return (%)'];
         const rows = trades.map(t => [
-            t.step,
+            t.step || 0,
             getActionInfo(t.action).label,
             getPositionLabel(t.position),
-            t.price.toFixed(2),
-            (t.net_return * 100).toFixed(2),
-            (t.cumulative_return * 100).toFixed(2),
+            (t.price || 0).toFixed(2),
+            ((t.net_return || 0) * 100).toFixed(2),
+            ((t.cumulative_return || 0) * 100).toFixed(2),
         ]);
 
         const csv = [headers, ...rows].map(row => row.join(',')).join('\n');
@@ -161,15 +161,15 @@ const TradesHistory = () => {
                                             {getPositionLabel(trade.position)}
                                         </td>
                                         <td className="py-3 px-4 text-sm text-right font-mono text-gray-900 dark:text-gray-100">
-                                            ${trade.price.toFixed(2)}
+                                            ${(trade.price || 0).toFixed(2)}
                                         </td>
-                                        <td className={`py-3 px-4 text-sm text-right font-semibold ${trade.net_return >= 0 ? 'text-green-600' : 'text-red-600'
+                                        <td className={`py-3 px-4 text-sm text-right font-semibold ${(trade.net_return || 0) >= 0 ? 'text-green-600' : 'text-red-600'
                                             }`}>
-                                            {trade.net_return >= 0 ? '+' : ''}{(trade.net_return * 100).toFixed(2)}%
+                                            {(trade.net_return || 0) >= 0 ? '+' : ''}{((trade.net_return || 0) * 100).toFixed(2)}%
                                         </td>
-                                        <td className={`py-3 px-4 text-sm text-right font-semibold ${trade.cumulative_return >= 0 ? 'text-green-600' : 'text-red-600'
+                                        <td className={`py-3 px-4 text-sm text-right font-semibold ${(trade.cumulative_return || 0) >= 0 ? 'text-green-600' : 'text-red-600'
                                             }`}>
-                                            {trade.cumulative_return >= 0 ? '+' : ''}{(trade.cumulative_return * 100).toFixed(2)}%
+                                            {(trade.cumulative_return || 0) >= 0 ? '+' : ''}{((trade.cumulative_return || 0) * 100).toFixed(2)}%
                                         </td>
                                     </tr>
                                 );

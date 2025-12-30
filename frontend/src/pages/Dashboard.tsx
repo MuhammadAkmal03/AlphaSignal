@@ -105,7 +105,8 @@ const Dashboard = () => {
     // ============================================
     // Small functions that format data for display
 
-    const formatPrice = (price: number) => {
+    const formatPrice = (price: number | undefined | null) => {
+        if (typeof price !== 'number') return '$0.00';
         return `$${price.toFixed(2)}`;
     };
 
@@ -289,15 +290,15 @@ const Dashboard = () => {
                         <div className="space-y-4">
                             <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
                                 <span className="text-gray-600 dark:text-gray-400 font-medium">MAE</span>
-                                <span className="font-bold text-lg">${metrics.mae.toFixed(2)}</span>
+                                <span className="font-bold text-lg">${metrics?.mae?.toFixed(2) || 'N/A'}</span>
                             </div>
                             <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
                                 <span className="text-gray-600 dark:text-gray-400 font-medium">MAPE</span>
-                                <span className="font-bold text-lg">{metrics.mape.toFixed(2)}%</span>
+                                <span className="font-bold text-lg">{metrics?.mape?.toFixed(2) || 'N/A'}%</span>
                             </div>
                             <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
                                 <span className="text-gray-600 dark:text-gray-400 font-medium">Total Predictions</span>
-                                <span className="font-bold text-lg">{metrics.total_predictions}</span>
+                                <span className="font-bold text-lg">{metrics?.total_predictions || 'N/A'}</span>
                             </div>
                         </div>
                     )}
@@ -339,7 +340,7 @@ const Dashboard = () => {
                                             {getSentimentIcon(article.sentiment)} {article.sentiment}
                                         </span>
                                         <span className="text-xs text-gray-500">
-                                            Score: {article.score.toFixed(2)}
+                                            Score: {article.score?.toFixed(2) || 'N/A'}
                                         </span>
                                     </div>
                                 </div>
