@@ -1,5 +1,4 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { Analytics } from '@vercel/analytics/react';
 import { ThemeProvider } from './contexts/ThemeContext';
 import Navbar from './components/Navbar';
 import Chatbot from './components/Chatbot';
@@ -7,7 +6,7 @@ import LandingPage from './pages/LandingPage';
 import Dashboard from './pages/Dashboard';
 import Backtesting from './pages/Backtesting';
 import RLAgent from './pages/RLAgent';
-import AnalyticsPage from './pages/Analytics';
+import Analytics from './pages/Analytics';
 import About from './pages/About';
 
 function App() {
@@ -22,15 +21,13 @@ function App() {
                         <Route path="/backtest" element={<Backtesting />} />
                         <Route path="/backtesting" element={<Backtesting />} />
                         <Route path="/rl-agent" element={<RLAgent />} />
-                        <Route path="/analytics" element={<AnalyticsPage />} />
+                        <Route path="/analytics" element={<Analytics />} />
                         <Route path="/about" element={<About />} />
                     </Routes>
                     {/* Chatbot available on all pages */}
                     <Chatbot />
                 </div>
             </Router>
-            {/* Vercel Analytics for visitor tracking */}
-            <Analytics />
         </ThemeProvider>
     );
 }

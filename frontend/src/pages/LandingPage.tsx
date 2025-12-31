@@ -12,7 +12,7 @@ const LandingPage = () => {
         {
             icon: <TrendingUp className="w-8 h-8" />,
             title: 'Price Predictions',
-            description: 'XGBoost model with 6.6 MAE accuracy for next-day crude oil prices',
+            description: 'XGBoost model with $1.23 MAE accuracy for next-day crude oil prices',
         },
         {
             icon: <BarChart3 className="w-8 h-8" />,
@@ -32,10 +32,10 @@ const LandingPage = () => {
     ];
 
     const stats = [
-        { label: 'Model Accuracy', value: '6.6 MAE' },
-        { label: 'Backtest Return', value: '+30%' },
-        { label: 'RL Performance', value: '1.30x' },
-        { label: 'Data Sources', value: '15+' },
+        { label: 'Model Accuracy', value: '$1.23 MAE' },
+        { label: 'MAPE', value: '1.85%' },
+        { label: 'Model Accuracy', value: '98.15%' },
+        { label: 'Data Sources', value: '5+' },
     ];
 
     const handleSubscribe = async (e: React.FormEvent) => {
