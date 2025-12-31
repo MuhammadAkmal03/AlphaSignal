@@ -28,18 +28,40 @@ class EmailResponse(BaseModel):
     success: bool
     message: str
 
+GCS_SUBSCRIBERS_PATH = "data/subscribers/subscribers.csv"
+
 
 def load_subscribers() -> pd.DataFrame:
-    """Load subscribers from CSV"""
-    if not SUBSCRIBERS_FILE.exists():
-        # Create empty DataFrame with correct columns
+    """Load subscribers from GCS for persistence"""
+    from services.gcs_data_loader import read_csv_from_gcs
+    
+    df = read_csv_from_gcs(GCS_SUBSCRIBERS_PATH)
+    if df is None or df.empty:
         return pd.DataFrame(columns=['email', 'subscribed_date', 'is_active', 'last_sent'])
-    return pd.read_csv(SUBSCRIBERS_FILE)
+    return df
 
 
 def save_subscribers(df: pd.DataFrame):
-    """Save subscribers to CSV"""
-    df.to_csv(SUBSCRIBERS_FILE, index=False)
+    """Save subscribers to GCS for persistence"""
+    from google.cloud import storage
+    import io
+    
+    try:
+        client = storage.Client()
+        bucket = client.bucket("alphasignal-models")
+        blob = bucket.blob(GCS_SUBSCRIBERS_PATH)
+        
+        # Convert DataFrame to CSV string
+        csv_buffer = io.StringIO()
+        df.to_csv(csv_buffer, index=False)
+        
+        # Upload to GCS
+        blob.upload_from_string(csv_buffer.getvalue(), content_type='text/csv')
+        print(f"Subscribers saved to GCS: {len(df)} records")
+    except Exception as e:
+        print(f"Error saving subscribers to GCS: {e}")
+        # Fallback to local file
+        df.to_csv(SUBSCRIBERS_FILE, index=False)
 
 
 def is_subscribed(email: str) -> bool:
