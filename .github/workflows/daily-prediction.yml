@@ -12,8 +12,9 @@ env:
 
 jobs:
   train-and-predict:
-    name: Train Model & Generate Prediction
+    name: Full Daily Pipeline
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     
     steps:
       - name: Checkout code
@@ -28,7 +29,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install --upgrade pip
-          pip install pandas numpy scikit-learn xgboost joblib google-cloud-storage yfinance requests python-dotenv
+          pip install -r requirements.txt
 
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
@@ -40,47 +41,100 @@ jobs:
 
       - name: Create directories
         run: |
+          mkdir -p data/raw/eia
+          mkdir -p data/raw/uso
+          mkdir -p data/raw/nlp
+          mkdir -p data/raw/ships
+          mkdir -p data/processed
           mkdir -p data/final/train
           mkdir -p data/final/prediction
-          mkdir -p data/processed
           mkdir -p models
 
-      - name: Download training data from GCS
+      - name: Download existing data from GCS
         run: |
-          echo "Downloading training data..."
-          gsutil cp gs://${{ env.BUCKET }}/data/train/train_dataset.csv data/final/train/
-          gsutil cp gs://${{ env.BUCKET }}/data/master/master_dataset.csv data/processed/
-          gsutil cp gs://${{ env.BUCKET }}/data/prediction/prediction_log.csv data/final/prediction/ || echo "No existing predictions"
-          echo "Training data downloaded!"
+          echo "Downloading existing data..."
+          gsutil -m cp -r gs://${{ env.BUCKET }}/data/train/* data/final/train/ || true
+          gsutil -m cp -r gs://${{ env.BUCKET }}/data/master/* data/processed/ || true
+          gsutil cp gs://${{ env.BUCKET }}/data/prediction/prediction_log.csv data/final/prediction/ || true
+          gsutil -m cp -r gs://${{ env.BUCKET }}/models/* models/ || true
+          # Download raw data for data fetchers to merge with
+          gsutil -m cp -r gs://${{ env.BUCKET }}/data/raw/* data/raw/ || true
+          echo "Download complete!"
 
-      - name: Train Model
+      # ========== PHASE 1: FETCH FRESH DATA ==========
+      - name: Fetch News & Sentiment
+        env:
+          NEWSAPI_KEY: ${{ secrets.NEWSAPI_KEY }}
         run: |
-          echo "Training XGBoost model..."
+          echo "Fetching oil news and sentiment..."
+          python src/data_sources/nlp/realtime_oil_news.py || echo "News fetch had issues, continuing..."
+        continue-on-error: true
+
+      - name: Fetch USO Prices
+        run: |
+          echo "Fetching USO ETF data..."
+          python src/data_sources/uso/uso_fetcher.py || echo "USO fetch had issues, continuing..."
+        continue-on-error: true
+
+      - name: Fetch EIA Data
+        env:
+          EIA_API_KEY: ${{ secrets.EIA_API_KEY }}
+        run: |
+          echo "Fetching EIA petroleum data..."
+          python src/data_sources/eia/eia_fetcher.py || echo "EIA fetch had issues, continuing..."
+        continue-on-error: true
+
+      - name: Fetch AIS Shipping Data
+        env:
+          AISSTREAM_API_KEY: ${{ secrets.AISSTREAM_API_KEY }}
+        run: |
+          echo "Fetching AIS tanker data (may take ~8 min)..."
+          timeout 600 python src/data_sources/ais/ais_stream.py || echo "AIS fetch had issues, continuing..."
+        continue-on-error: true
+
+      # ========== PHASE 2: BUILD DATASET & TRAIN ==========
+      - name: Build Master Dataset
+        run: |
+          echo "Building master dataset..."
+          python src/final_data/01_build_master_dataset.py || true
+          python src/final_data/02_clean_master.py || true
+          python src/modelling/prepare_train_set.py || true
+
+      - name: Train XGBoost Model
+        run: |
+          echo "Training model..."
           python src/modelling/train_model.py
-          echo "Model training complete!"
+          echo "Model trained!"
 
+      # ========== PHASE 3: GENERATE PREDICTION ==========
       - name: Generate Prediction
         run: |
           echo "Generating prediction for tomorrow..."
           python src/modelling/predict_and_log.py
-          echo "Prediction generated!"
+          echo "Prediction:"
           cat data/final/prediction/latest_prediction.txt
 
+      # ========== PHASE 4: UPLOAD TO GCS ==========
       - name: Upload results to GCS
         run: |
           echo "Uploading to GCS..."
-          gsutil cp models/xgb_model.pkl gs://${{ env.BUCKET }}/models/
-          gsutil cp models/scaler.pkl gs://${{ env.BUCKET }}/models/
+          # Models
+          gsutil -m cp models/xgb_model.pkl models/scaler.pkl gs://${{ env.BUCKET }}/models/
+          # Predictions
           gsutil cp data/final/prediction/prediction_log.csv gs://${{ env.BUCKET }}/data/prediction/
           gsutil cp data/final/prediction/latest_prediction.txt gs://${{ env.BUCKET }}/data/prediction/
           gsutil cp data/final/prediction/performance_metrics.csv gs://${{ env.BUCKET }}/data/prediction/ || true
+          # News
+          gsutil cp data/raw/nlp/realtime_news_detailed.csv gs://${{ env.BUCKET }}/data/news/realtime_news_sentiment.csv || true
+          # Raw data for next run
+          gsutil -m cp -r data/raw/* gs://${{ env.BUCKET }}/data/raw/ || true
           echo "Upload complete!"
 
       - name: Summary
         run: |
           echo "=========================================="
-          echo "Daily Training Pipeline Completed!"
+          echo "DAILY PIPELINE COMPLETE!"
           echo "=========================================="
           echo "Date: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
-          echo "Latest Prediction: $(cat data/final/prediction/latest_prediction.txt)"
+          echo "Prediction: $(cat data/final/prediction/latest_prediction.txt 2>/dev/null || echo 'N/A')"
           echo "=========================================="
