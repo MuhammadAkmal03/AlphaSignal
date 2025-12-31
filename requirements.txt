@@ -47,4 +47,5 @@ seaborn
 newsapi-python
 
 # Production Server 
-gunicorn==21.2.0sendgrid
+gunicorn==21.2.0
+sendgrid
