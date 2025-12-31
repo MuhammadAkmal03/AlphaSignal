@@ -1,25 +1,13 @@
-# Daily Pipeline Requirements (Lightweight)
-# Only packages needed for daily training & prediction
+# Daily Pipeline Requirements (Minimal)
+# Only essential packages for training & prediction
 
-# Core
 pandas
 numpy
 python-dotenv
-
-# Data Fetching
 yfinance
 requests
 websockets
-newsapi-python
-
-# Machine Learning
 xgboost
 scikit-learn
 joblib
-
-# Google Cloud
 google-cloud-storage
-
-# NLP (for sentiment)
-transformers
-torch --index-url https://download.pytorch.org/whl/cpu
