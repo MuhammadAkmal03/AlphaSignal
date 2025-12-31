@@ -1,4 +1,4 @@
-name: Daily Prediction Update
+name: Daily Model Training & Prediction
 
 on:
   schedule:
@@ -6,83 +6,81 @@ on:
     - cron: '30 0 * * *'
   workflow_dispatch:  # Allow manual trigger
 
+env:
+  PROJECT_ID: alphasignal-480013
+  BUCKET: alphasignal-models
+
 jobs:
-  update-prediction:
-    name: Update Daily Prediction
+  train-and-predict:
+    name: Train Model & Generate Prediction
     runs-on: ubuntu-latest
     
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.10'
+          cache: 'pip'
 
       - name: Install dependencies
         run: |
-          pip install pandas google-cloud-storage yfinance
+          pip install --upgrade pip
+          pip install pandas numpy scikit-learn xgboost joblib google-cloud-storage yfinance requests python-dotenv
 
       - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v1
+        uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
 
       - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v1
+        uses: google-github-actions/setup-gcloud@v2
 
-      - name: Download current predictions from GCS
+      - name: Create directories
         run: |
+          mkdir -p data/final/train
           mkdir -p data/final/prediction
-          gsutil cp gs://alphasignal-models/data/prediction/prediction_log.csv data/final/prediction/ || true
+          mkdir -p data/processed
+          mkdir -p models
 
-      - name: Generate prediction for tomorrow
+      - name: Download training data from GCS
         run: |
-          python -c "
-          import pandas as pd
-          from datetime import datetime, timedelta
-          import random
+          echo "Downloading training data..."
+          gsutil cp gs://${{ env.BUCKET }}/data/train/train_dataset.csv data/final/train/
+          gsutil cp gs://${{ env.BUCKET }}/data/master/master_dataset.csv data/processed/
+          gsutil cp gs://${{ env.BUCKET }}/data/prediction/prediction_log.csv data/final/prediction/ || echo "No existing predictions"
+          echo "Training data downloaded!"
 
-          # Load existing predictions
-          try:
-              df = pd.read_csv('data/final/prediction/prediction_log.csv')
-          except:
-              df = pd.DataFrame(columns=['date', 'predicted'])
-
-          # Get tomorrow's date
-          tomorrow = (datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d')
-          
-          # Check if we already have tomorrow's prediction
-          if tomorrow in df['date'].astype(str).values:
-              print(f'Prediction for {tomorrow} already exists')
-          else:
-              # Generate prediction with small variation from last price
-              if len(df) > 0:
-                  last_price = float(df['predicted'].iloc[-1])
-                  variation = random.uniform(-0.02, 0.02)  # ±2%
-                  new_price = round(last_price * (1 + variation), 2)
-              else:
-                  new_price = 74.50  # Default price
-              
-              # Add new prediction
-              new_row = pd.DataFrame([{'date': tomorrow, 'predicted': new_price}])
-              df = pd.concat([df, new_row], ignore_index=True)
-              df.to_csv('data/final/prediction/prediction_log.csv', index=False)
-              
-              # Update latest prediction
-              with open('data/final/prediction/latest_prediction.txt', 'w') as f:
-                  f.write(str(new_price))
-              
-              print(f'Added prediction for {tomorrow}: \${new_price}')
-          "
-
-      - name: Upload predictions to GCS
+      - name: Train Model
         run: |
-          gsutil cp data/final/prediction/prediction_log.csv gs://alphasignal-models/data/prediction/prediction_log.csv
-          gsutil cp data/final/prediction/latest_prediction.txt gs://alphasignal-models/data/prediction/latest_prediction.txt || true
+          echo "Training XGBoost model..."
+          python src/modelling/train_model.py
+          echo "Model training complete!"
+
+      - name: Generate Prediction
+        run: |
+          echo "Generating prediction for tomorrow..."
+          python src/modelling/predict_and_log.py
+          echo "Prediction generated!"
+          cat data/final/prediction/latest_prediction.txt
+
+      - name: Upload results to GCS
+        run: |
+          echo "Uploading to GCS..."
+          gsutil cp models/xgb_model.pkl gs://${{ env.BUCKET }}/models/
+          gsutil cp models/scaler.pkl gs://${{ env.BUCKET }}/models/
+          gsutil cp data/final/prediction/prediction_log.csv gs://${{ env.BUCKET }}/data/prediction/
+          gsutil cp data/final/prediction/latest_prediction.txt gs://${{ env.BUCKET }}/data/prediction/
+          gsutil cp data/final/prediction/performance_metrics.csv gs://${{ env.BUCKET }}/data/prediction/ || true
+          echo "Upload complete!"
 
       - name: Summary
         run: |
-          echo "Daily prediction update completed!"
+          echo "=========================================="
+          echo "Daily Training Pipeline Completed!"
+          echo "=========================================="
           echo "Date: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+          echo "Latest Prediction: $(cat data/final/prediction/latest_prediction.txt)"
+          echo "=========================================="
