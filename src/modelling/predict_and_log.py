@@ -62,10 +62,12 @@ def predict_and_log():
     scaler = joblib.load(SCALER)
 
     pred = model.predict(scaler.transform(latest))[0]
-    today = datetime.utcnow().date()
+    # Predict for TOMORROW (next trading day)
+    from datetime import timedelta
+    tomorrow = datetime.utcnow().date() + timedelta(days=1)
 
     LOG.parent.mkdir(parents=True, exist_ok=True)
-    row = pd.DataFrame([{"date": today, "predicted": pred}])
+    row = pd.DataFrame([{"date": tomorrow, "predicted": pred}])
 
     if LOG.exists():
         pd.concat([pd.read_csv(LOG), row]).to_csv(LOG, index=False)

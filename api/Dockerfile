@@ -16,9 +16,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application code
 COPY . .
 
-# Copy src folder from parent directory (needed for imports)
-COPY ../src ./src
-
 # Create necessary directories
 RUN mkdir -p data/final/prediction data/final/shap models logs
 

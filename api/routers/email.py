@@ -12,7 +12,7 @@ import sys
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from api.services.sendgrid_email_service import send_instant_report, send_daily_report
+from services.sendgrid_email_service import send_instant_report, send_daily_report
 
 router = APIRouter()
 
@@ -73,7 +73,7 @@ async def send_report_now(request: EmailRequest):
         # Load metrics (optional)
         metrics_data = None
         try:
-            from api.routers.metrics import get_model_metrics
+            from routers.metrics import get_model_metrics
             metrics_response = await get_model_metrics()
             metrics_data = {
                 'mae': metrics_response.get('mae', 0),
