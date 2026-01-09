@@ -45,6 +45,14 @@ const Dashboard = () => {
 
     useEffect(() => {
         loadDashboardData();
+
+        // GA: track page view
+        if (typeof window !== 'undefined' && (window as any).gtag) {
+            (window as any).gtag('event', 'dashboard_view', {
+                event_category: 'navigation',
+                event_label: 'view_dashboard',
+            });
+        }
     }, []); // Empty dependency array = run once on mount
 
     // ============================================

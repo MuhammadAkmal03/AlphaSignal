@@ -62,6 +62,14 @@ const LandingPage = () => {
                 throw new Error(data.detail || 'Failed to subscribe');
             }
 
+            // GA: track subscription
+            if (typeof window !== 'undefined' && window.gtag) {
+                window.gtag('event', 'email_subscription', {
+                    event_category: 'engagement',
+                    event_label: 'newsletter_signup',
+                });
+            }
+
             setSubscribeSuccess(true);
             setEmail('');
             setTimeout(() => setSubscribeSuccess(false), 5000);

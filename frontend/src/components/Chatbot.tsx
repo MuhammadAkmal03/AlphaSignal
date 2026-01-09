@@ -47,6 +47,14 @@ const Chatbot = () => {
             };
 
             setMessages(prev => [...prev, assistantMessage]);
+
+            // GA: track chatbot use
+            if (typeof window !== 'undefined' && (window as any).gtag) {
+                (window as any).gtag('event', 'chatbot_message', {
+                    event_category: 'engagement',
+                    event_label: 'chatbot_interaction',
+                });
+            }
         } catch (err) {
             console.error('Chat error:', err);
             const errorMessage: Message = {
