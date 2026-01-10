@@ -44,3 +44,4 @@ export const trackBacktestRun = () => {
 export const trackPredictionView = () => {
     trackEvent('prediction_view', 'feature', 'view_prediction');
 };
+    
